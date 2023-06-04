@@ -1,20 +1,21 @@
 <resources>
     <string name="app_name">Avaruussää</string>
+
+    <!-- Main activity -->
     <string name="activity_main_activity_title">Aktiivisuus</string>
-    <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Settings</string>
-    <string name="sync_header">Sync</string>
+    <!-- Main activity content descriptions -->
+    <string name="main_btn_settings_content_description">Go to settings screen</string>
 
-    <!-- Messages Preferences -->
-    <string name="settings_notification_treshold">Notification threshold</string>
-    <string name="reply_title">Default reply action</string>
+    <!-- Settings activity -->
+    <string name="title_activity_settings">Settings</string>
+    <string name="settings_threshold_title">Notification threshold (nT/s)</string>
+    <string name="settings_interval_title">Notification min. interval (hours)</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_summary_off">Notifications disabled</string>
+    <string name="settings_notifications_summary_on">Notifications enabled</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <!-- Settings activity content descriptions -->
+    <string name="settings_btn_back_content_description">Go back to previous screen</string>
+
 </resources>

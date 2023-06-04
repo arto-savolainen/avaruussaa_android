@@ -1,7 +1,9 @@
 package com.example.avaruussaa_android;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
+import android.app.UiModeManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         TextView activityValueView = findViewById(R.id.label_activity_value);
         activityValueView.setText(activityValue);
 
-        ImageButton settingsBtn = findViewById(R.id.btn_settings);
+        ImageButton settingsBtn = findViewById(R.id.main_btn_settings);
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -27,5 +29,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(startIntent);
             }
         });
+
+        // Always use night theme
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
     }
 }

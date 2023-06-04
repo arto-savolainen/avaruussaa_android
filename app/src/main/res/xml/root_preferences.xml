@@ -2,24 +2,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
-        app:key="notification_treshold"
-        app:title="@string/settings_notification_treshold"
+        app:key="threshold"
+        app:title="@string/settings_threshold_title"
+        app:defaultValue="0.4"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        app:key="interval"
+        app:title="@string/settings_interval_title"
+        app:defaultValue="1"
         app:useSimpleSummaryProvider="true" />
     <SwitchPreferenceCompat
-        app:key="sync"
-        app:title="@string/sync_title" />
-    <ListPreference
-        app:defaultValue="reply"
-        app:entries="@array/reply_entries"
-        app:entryValues="@array/reply_values"
-        app:key="reply"
-        app:title="@string/reply_title"
-        app:useSimpleSummaryProvider="true" />
-    <SwitchPreferenceCompat
-        app:dependency="sync"
-        app:key="attachment"
-        app:summaryOff="@string/attachment_summary_off"
-        app:summaryOn="@string/attachment_summary_on"
-        app:title="@string/attachment_title" />
+        app:defaultValue="true"
+        app:icon="@drawable/baseline_notifications_24"
+        app:key="notifications"
+        app:summaryOff="@string/settings_notifications_summary_off"
+        app:summaryOn="@string/settings_notifications_summary_on"
+        app:title="@string/settings_notifications_title" />
+
 
 </PreferenceScreen>
