@@ -3,12 +3,12 @@ package com.example.avaruussaa_android;
 import androidx.annotation.NonNull;
 
 public class Station {
-    private String name;
-    private String code;
-    private int activity;
+    private final String name;
+    private final String code;
+    private double activity;
     private String error;
 
-    // This constructor can be removed if I don't find a use for it
+    // TODO: This constructor can be removed if I don't find a use for it
     public Station(@NonNull String name) {
         this.name = name;
         this.code = "";
@@ -19,7 +19,7 @@ public class Station {
         this.code = code;
     }
 
-    // This constructor can be removed if I don't find a use for it
+    // TODO: This constructor can be removed if I don't find a use for it
     public Station(@NonNull String name, @NonNull String code, int activity) {
         this.name = name;
         this.code = code;
@@ -34,12 +34,13 @@ public class Station {
         return code;
     }
 
-    public int activity() {
+    public double activity() {
         return activity;
     }
 
-    public void setActivity(@NonNull int newActivity) {
+    public void setActivity(double newActivity) {
         activity = newActivity;
+        error = null;
     }
 
     public void setError(String newError) {

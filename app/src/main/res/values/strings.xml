@@ -2,7 +2,7 @@
     <string name="app_name">Avaruussää</string>
 
     <!-- Main activity -->
-    <string name="activity_main_activity_title">Aktiivisuus</string>
+    <string name="activity_main_activity_title">Activity</string>
 
     <!-- Main activity content descriptions -->
     <string name="main_btn_settings_content_description">Go to settings screen</string>
@@ -17,5 +17,9 @@
 
     <!-- Settings activity content descriptions -->
     <string name="settings_btn_back_content_description">Go back to previous screen</string>
+
+    <!-- Programmatically set station error messages -->
+    <string name="error_station_disabled">Data for %1$s observatory is temporarily disabled.</string>
+    <string name="error_station_null">Latest activity data for %1$s observatory not found. Check back soon.</string>
 
 </resources>

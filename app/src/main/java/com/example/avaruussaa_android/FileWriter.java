@@ -15,7 +15,7 @@ public class FileWriter {
     private FileWriter() {
     }
 
-    public static void write(@NonNull Context context, @NonNull String filename, @NonNull String content) throws IOException {
+    public static void write(@NonNull Context context, @NonNull String filename, String content) throws IOException {
         File file = new File(context.getFilesDir(), filename);
 
         try (FileOutputStream outputStream = new FileOutputStream(file);
