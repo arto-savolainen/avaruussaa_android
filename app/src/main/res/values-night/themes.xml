@@ -2,7 +2,11 @@
     <style name="Base.Theme.Avaruussää" parent="Theme.Material3.Dark.NoActionBar">
         // Color of the top system bar
         <item name="colorPrimaryDark">@color/background</item>
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textColorSecondary">@color/dark_purple</item>
+        <item name="android:textColorTertiary">@color/primary_dark</item>
         <item name="android:colorBackground">@color/background</item>
+
     </style>
 
     <style name="Theme.Avaruussää" parent="Base.Theme.Avaruussää" />

@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.avaruussaa_android"
-        minSdk 30
+        minSdk 22
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -23,15 +23,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_1_9
     }
 }
 
 dependencies {
     // For background work
     implementation "androidx.work:work-runtime:2.8.1"
-
+    // OkHttp for HTTP requests
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
     // Splash screen for API < 31
     implementation "androidx.core:core-splashscreen:1.0.0"
 

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private String activityValue = "420";
+    private Station currentStation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
