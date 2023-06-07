@@ -2,29 +2,29 @@ package com.example.avaruussaa_android;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DataFetchWorker extends Worker {
+public class UpdateWorker extends Worker {
     private static final String TAG = "mytag";
+    private static final String URL = "https://www.ilmatieteenlaitos.fi/revontulet-ja-avaruussaa";
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final String URL = "https://www.ilmatieteenlaitos.fi/revontulet-ja-avaruussaa";
-
-    public DataFetchWorker(@NonNull Context context, @NonNull WorkerParameters params) {
+    public UpdateWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
+
+    //TODO: CHECK APP LIFECYCLES AND ONLY ACCESS STATIONSDATA IF ITS ACTUALLY ALIVE AND HAS DATA
 
     @NonNull
     @WorkerThread
@@ -38,8 +38,6 @@ public class DataFetchWorker extends Worker {
             // Station codes are used to find data within the javascript contained in response.body()
             // Data starts after this string
             String delimiter = station.code() + "\\\":{\\\"dataSeries\\\":";
-
-            Log.d("mytag", "DELIMITER: " + delimiter);
             // Split response body in two, the data is found at the beginning of the second array element
             String[] splitResponseBody = Utils.splitString(responseBody, delimiter);
 
@@ -52,7 +50,6 @@ public class DataFetchWorker extends Worker {
                 continue;
             }
 
-            Log.d(TAG, "SPLITRESPONSE LENGTH: " + splitResponseBody.length);
             // The data we're looking for ends with "}"
             // Now the response body will be cut with the starting and ending delimiters to obtain the javascript array holding station data
             splitResponseBody = Utils.splitString(splitResponseBody[1], "}");
@@ -67,30 +64,56 @@ public class DataFetchWorker extends Worker {
             String activity = Utils.splitString(splitData[splitData.length - 1], "]")[0];
             String previousActivity = Utils.splitString(splitData[splitData.length - 3], "]")[0];
 
-            try {
-                // Sometimes activity values for stations are recorded as null in the data, in which case set error for the station
-                if (activity.contains("null")) {
-                    // Use activity previous to latest. This may also be null but most often contains valid data
-                    if (previousActivity.contains("null")) {
-                        station.setError(getApplicationContext().getString(R.string.error_station_null, station.name()));
-                    }
-                    else {
-                        station.setActivity(Double.parseDouble(previousActivity));
-                    }
+
+            // Sometimes activity values for stations are recorded as null in the data, in which case set error for the station
+            if (activity.contains("null")) {
+                // Use activity previous to latest. This may also be null but most often contains valid data
+                if (previousActivity.contains("null")) {
+                    station.setError(getApplicationContext().getString(R.string.error_station_null, station.name()));
+                } else {
+                    setActivity(station, previousActivity);
                 }
-                else {
-                    station.setActivity(Double.parseDouble(activity));
-                }
-            }
-            catch (NumberFormatException e) {
-                // This should never be reached if the data is valid
-                station.setError(getApplicationContext().getString(R.string.error_station_null, station.name()));
+            } else {
+                setActivity(station, activity);
             }
 
             Log.d(TAG, "STATION AT END OF FOR LOOP: " + station);
         }
 
         return Result.success();
+    }
+
+    // Sets station activity in StationsData. Also checks if the station whose data we are changing is the currently selected station
+    // in which case station data is also written to SharedPreferences
+    private void setActivity(Station station, String activity) {
+        station.setActivity(activity);
+
+        String currentStationName = Utils.getStringFromSharedPreferences(getApplicationContext(), "current_station_name");
+
+        if (station.name().equals(currentStationName)) {
+            StationsData.setCurrentStation(getApplicationContext(), station.name());
+        }
+    }
+
+    // Sets station error in StationsData. Also checks if the station whose data we are changing is the currently selected station
+    // in which case calls StationData.updateCurrentStation()
+    private void setError(Station station, String error) {
+        station.setActivity(error);
+
+        String currentStationName = Utils.getStringFromSharedPreferences(getApplicationContext(), "current_station_name");
+
+        if (Objects.equals(station.name(), currentStationName)) {
+            List<Pair<String, String>> stationData = createStationPreferenceList(station.name(), "", error);
+            Utils.writeStringsToStationStore(getApplicationContext(), stationData);
+        }
+    }
+
+    private List<Pair<String, String>> createStationPreferenceList(String name, String activity, String error) {
+        return List.of(
+            new Pair<>("current_station_name", name),
+            new Pair<>("current_station_activity", activity),
+            new Pair<>("current_station_error", error)
+        );
     }
 
     private String fetchData() {

@@ -48,13 +48,13 @@
         app:srcCompat="@drawable/baseline_settings_24" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/main_btn_station"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="92dp"
         android:backgroundTint="#00BC1515"
-        android:text="Nurmijärvi"
+        android:text="Temp"
         android:textColor="@color/dark_purple"
         android:textSize="26sp"
         app:icon="@drawable/station_icon_large"

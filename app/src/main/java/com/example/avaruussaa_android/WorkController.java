@@ -12,7 +12,7 @@ public class WorkController {
     private WorkController() {}
 
     public static void initWork(@NonNull Context context) {
-        WorkRequest request = new OneTimeWorkRequest.Builder(DataFetchWorker.class)
+        WorkRequest request = new OneTimeWorkRequest.Builder(UpdateWorker.class)
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build();
 

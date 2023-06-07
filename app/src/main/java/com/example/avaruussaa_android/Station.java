@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 public class Station {
     private final String name;
     private final String code;
-    private double activity;
+    private String activity;
     private String error;
 
     // TODO: This constructor can be removed if I don't find a use for it
@@ -20,7 +20,7 @@ public class Station {
     }
 
     // TODO: This constructor can be removed if I don't find a use for it
-    public Station(@NonNull String name, @NonNull String code, int activity) {
+    public Station(@NonNull String name, @NonNull String code, String activity) {
         this.name = name;
         this.code = code;
         this.activity = activity;
@@ -34,13 +34,17 @@ public class Station {
         return code;
     }
 
-    public double activity() {
+    public String activity() {
         return activity;
     }
 
-    public void setActivity(double newActivity) {
+    public String error() {
+        return error;
+    }
+
+    public void setActivity(String newActivity) {
         activity = newActivity;
-        error = null;
+        error = "";
     }
 
     public void setError(String newError) {
