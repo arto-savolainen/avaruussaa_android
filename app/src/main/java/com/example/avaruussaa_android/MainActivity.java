@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -18,14 +19,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final MainModel viewModel = new ViewModelProvider(this).get(MainModel.class);
-        TextView activityView = findViewById(R.id.label_activity_value);
+        TextView activityView = findViewById(R.id.main_tv_activity_value);
         ImageButton settingsBtn = findViewById(R.id.main_btn_settings);
         Button stationBtn = findViewById((R.id.main_btn_station));
+
+        Log.d("mytag", "MAIN ACTIVITY ONCREATE");
 
         // Create the observer which updates main_btn_station when the current station changes
         viewModel.getName().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newName) {
+                Log.d("mytag", "MAIN ACTIVITY!!!!!!!!! CURRENT STATION CHANGES");
                 stationBtn.setText(newName);
             }
         });
@@ -34,7 +38,12 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getActivity().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newActivity) {
+                Log.d("mytag", "MAIN ACTIVITY!!!!!!!!! ACTIVITY CHANGES");
                 activityView.setText(newActivity);
+
+                if (!newActivity.contains("loading")) {
+                    activityView.setTextAppearance(R.style.ActivityStyle);
+                }
             }
         });
 
@@ -43,21 +52,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(String newError) {
                 if (newError.length() > 0) {
-                    // TODO set activityView text style
                     activityView.setText(newError);
                     activityView.setTextAppearance(R.style.ErrorStyle);
                 }
             }
         });
-
-
-
-        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
-//        viewModel.getStationName().observe(this, nameObserver);
-
-
-        viewModel.getError().getValue();
-        // TODO textView.setTextAppearance(R.style.style_two) < use this change style of activityView
 
         // Navigate to SettingsActivity when user presses the settings button
         settingsBtn.setOnClickListener(new View.OnClickListener() {

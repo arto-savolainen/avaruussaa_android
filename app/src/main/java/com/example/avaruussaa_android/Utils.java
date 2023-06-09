@@ -4,10 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -17,37 +22,17 @@ public class Utils {
         return Pattern.compile(Pattern.quote(delimiter)).split(string);
     }
 
+    // Use this to format user input numerals
     public static void removeTrailingZeroes(@NonNull String string) {
         // TODO implementation
     }
 
-    // Takes key and value Strings and writes them to "StationStore" SharedPreferences
-    @SuppressLint("ApplySharedPref")
-    public static void writeStringToStationStore(@NonNull Context context, @NonNull String key, @NonNull String value) {
-        SharedPreferences stationStore = context.getSharedPreferences("StationStore", 0);
-        Editor editor = stationStore.edit();
-        editor.putString(key, value);
-        editor.commit();
-    }
+    public static void writeToFile(@NonNull Context context, @NonNull String filename, String content) throws IOException {
+        File file = new File(context.getFilesDir(), filename);
 
-    // Takes a list of key-value Pairs and writes them to "StationStore" SharedPreferences
-    // Note: currently not used, may remove later
-    @SuppressLint("ApplySharedPref")
-    public static void writeStringsToStationStore(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
-        SharedPreferences stationStore = context.getSharedPreferences("StationStore", 0);
-        Editor editor = stationStore.edit();
-        editor.clear(); // Clear values to remove old errors
-
-        for (Pair<String, String> p : prefs) {
-            editor.putString(p.first, p.second);
+        try (FileOutputStream outputStream = new FileOutputStream(file);
+             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream)) {
+            outputStreamWriter.write(content);
         }
-
-        editor.commit();
-    }
-
-    // Gets the value of a String preference of name "key", returns empty string if no preference is found
-    public static String getStringFromSharedPreferences(@NonNull Context context, String key) {
-        SharedPreferences stationStore = context.getSharedPreferences("StationStore", 0);
-        return stationStore.getString(key, "");
     }
 }

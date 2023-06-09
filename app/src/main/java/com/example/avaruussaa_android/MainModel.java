@@ -1,56 +1,97 @@
 package com.example.avaruussaa_android;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.SavedStateHandle;
+
 
 // ViewModel for handling data and user actions for MainActivity
-public class MainModel extends ViewModel {
+public class MainModel extends AndroidViewModel {
     private static final String TAG = "mainmodeltag";
-    // Information of the station the user has selected for displaying on MainActivity
-    private final MutableLiveData<String> name = new MutableLiveData<>();
-    private final MutableLiveData<String> activity = new MutableLiveData<>();
-    private final MutableLiveData<String> error = new MutableLiveData<>();
+    private final SavedStateHandle savedStateHandle;
+    private final MutableLiveData<String> nameLiveData;
+    private final MutableLiveData<String> activityLiveData;
+    private final MutableLiveData<String> errorLiveData;
+    SharedPreferences.OnSharedPreferenceChangeListener listener = null;
 
-    public MainModel() {
-        Log.d(TAG, "MAINMODEL CONSTRUCTOR");
-        Log.d(TAG, "STATION NAME AT FIRST: " + name.getValue());
-        Log.d(TAG, "CURRENT ACTIVITY AT FIRST: " + activity.getValue());
+    public MainModel(Application application, SavedStateHandle savedStateHandle) {
+        super(application);
+        this.savedStateHandle = savedStateHandle;
 
-        DataMediator.subscribe(this);
+        Context context = getApplication().getApplicationContext();
+        nameLiveData = savedStateHandle.getLiveData("NAME", "");
+        activityLiveData = savedStateHandle.getLiveData("ACTIVITY", "");
+        errorLiveData = savedStateHandle.getLiveData("ERROR", "");
+
+        if (activityLiveData.getValue().length() == 0) {
+            activityLiveData.setValue(getApplication().getResources().getString(R.string.main_loading_text));
+        }
+        if (nameLiveData.getValue().length() == 0) {
+            nameLiveData.setValue(StationsData.getCurrentStationNameFromPreferences(context));
+        }
+
+        registerStationChangeListener();
+    }
+
+    // Creates and registers a listener for changes to StationStore SharedPreferences
+    // Whenever the currently selected station changes, or a data update is indicated via changing the "refresh" key,
+    // fetches data for that station and sets MutableLiveData & savedStateHandle accordingly
+    public void registerStationChangeListener() {
+        Context context = getApplication().getApplicationContext();
+
+        SharedPreferences stationStore = context.getSharedPreferences("StationStore", Context.MODE_PRIVATE);
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                Log.d(TAG, "onSharedPreferenceChanged: key: " + key);
+
+                // If the currently selected station has changed, fetch data for that station and update LiveData
+                if (key != null && key.equals("current_station_name")) {
+                    Station currentStation = StationsData.getStationFromPreferences(context, StationsData.getCurrentStationNameFromPreferences(context));
+
+                    Log.d(TAG, "currentStation data fetched, here it is: " + currentStation);
+                    updateLiveDataAndSavedStateHandle(currentStation);
+                }
+
+                if (key != null && key.equals("refresh")) {
+                    Station currentStation = StationsData.getStationFromPreferences(context, StationsData.getCurrentStationNameFromPreferences(context));
+                    updateLiveDataAndSavedStateHandle(currentStation);
+                }
+            }
+        };
+
+        stationStore.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    private void updateLiveDataAndSavedStateHandle(Station currentStation) {
+        Log.d(TAG, "updateLiveDataAndSavedStateHandle: updating LiveData and savedStateHandle. currentStation:" + currentStation);
+        nameLiveData.setValue(currentStation.name());
+        activityLiveData.setValue(currentStation.activity());
+        errorLiveData.setValue(currentStation.error());
+        savedStateHandle.set("NAME", currentStation.name());
+        savedStateHandle.set("ACTIVITY", currentStation.activity());
+        savedStateHandle.set("ERROR", currentStation.error());
     }
 
     @Override
     public void onCleared() {
-        DataMediator.unsubscribe();
-    }
-
-    // This is called by DataMediator after station data has been updated
-    public void updateModelData(Station station) {
-        Log.d("mytag", "IN UPDATEMODELDATA, station: " + station);
-        name.postValue(station.name());
-        activity.postValue(station.activity());
-        error.postValue(station.error());
-
-        Log.d(TAG, "MAINMODEL CONSTRUCTOR");
-        Log.d(TAG, "UPDATEMODELDATA CURRENT NAME: " + name.getValue());
-        Log.d(TAG, "UPDATEMODELDATA CURRENT ACTIVITY: " + activity.getValue());
-        Log.d(TAG, "UPDATEMODELDATA CURRENT ERROR: " + error.getValue());
     }
 
     LiveData<String> getName() {
-        return name;
+        return nameLiveData;
     }
 
     LiveData<String> getActivity() {
-        return activity;
+        return activityLiveData;
     }
 
     LiveData<String> getError() {
-        return error;
+        return errorLiveData;
     }
-
-
 }

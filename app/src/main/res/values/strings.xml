@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Avaruussää</string>
 
+    <!-- The default weather station the data of which will be loaded on first run of the app -->
+    <string name="default_station_name">Nurmijärvi</string>
+
     <!-- Main activity -->
-    <string name="activity_main_activity_title">Activity</string>
+    <string name="main_activity_title">ACTIVITY</string>
+    <string name="main_loading_text">loading...</string>
 
     <!-- Main activity content descriptions -->
     <string name="main_btn_settings_content_description">Go to settings screen</string>
@@ -21,5 +25,12 @@
     <!-- Programmatically set station error messages -->
     <string name="error_station_disabled">Data for %1$s observatory is temporarily disabled.</string>
     <string name="error_station_null">Latest activity data for %1$s observatory not found. Check back soon.</string>
-
+    
+    <!-- Notifications-->
+    <string name="notification_channel_id">activity_channel</string>
+    <string name="notification_channel_name">Activity notifications</string>
+    <string name="notification_channel_description">Notifications for northern lights activity</string>
+    <string name="notification_title">Northern lights likely</string>
+    <string name="notification_body">"Magnetic activity @ %1$s: %2$s nT/s"</string>
+    
 </resources>

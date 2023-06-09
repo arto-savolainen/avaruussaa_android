@@ -7,11 +7,12 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/label_activity_title"
+        android:id="@+id/main_tv_activity_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/activity_main_activity_title"
-        android:textColor="#8300F3"
+        android:gravity="center"
+        android:text="@string/main_activity_title"
+        android:textColor="@color/purple"
         android:textSize="55sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,18 +22,31 @@
         app:layout_constraintVertical_bias="0.148" />
 
     <TextView
-        android:id="@+id/label_activity_value"
+        android:id="@+id/main_tv_activity_unit"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="(nT/s)"
+        android:textColor="@color/purple"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_title" />
+
+    <TextView
+        android:id="@+id/main_tv_activity_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="92dp"
         android:fontFamily="sans-serif"
+        android:gravity="center"
         android:text="0"
-        android:textColor="#1717FC"
-        android:textSize="100sp"
+        android:textColor="@color/primary_dark"
+        android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_activity_title" />
+        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_title" />
 
     <ImageButton
         android:id="@+id/main_btn_settings"
@@ -42,10 +56,10 @@
         android:layout_marginEnd="16dp"
         android:background="#00FFFFFF"
         android:contentDescription="@string/main_btn_settings_content_description"
-        app:tint="@color/icon_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_settings_24" />
+        app:srcCompat="@drawable/baseline_settings_24"
+        app:tint="@color/icon_grey" />
 
     <Button
         android:id="@+id/main_btn_station"
@@ -54,7 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="92dp"
         android:backgroundTint="#00BC1515"
-        android:text="Temp"
+        android:text="loading..."
         android:textColor="@color/dark_purple"
         android:textSize="26sp"
         app:icon="@drawable/station_icon_large"
@@ -63,6 +77,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_activity_value" />
+        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_value" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

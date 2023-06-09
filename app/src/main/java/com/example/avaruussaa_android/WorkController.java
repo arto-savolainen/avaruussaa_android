@@ -1,6 +1,7 @@
 package com.example.avaruussaa_android;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.OneTimeWorkRequest;
@@ -12,12 +13,14 @@ public class WorkController {
     private WorkController() {}
 
     public static void initWork(@NonNull Context context) {
+        Log.d("mytag", "initWork: IN INITWORK");
         WorkRequest request = new OneTimeWorkRequest.Builder(UpdateWorker.class)
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST) // This doesn't work on older Android versions
             .build();
 
         WorkManager
             .getInstance(context)
             .enqueue(request);
+
     }
 }

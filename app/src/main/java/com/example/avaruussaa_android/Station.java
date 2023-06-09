@@ -5,10 +5,9 @@ import androidx.annotation.NonNull;
 public class Station {
     private final String name;
     private final String code;
-    private String activity;
-    private String error;
+    private String activity = "loading...";
+    private String error = "";
 
-    // TODO: This constructor can be removed if I don't find a use for it
     public Station(@NonNull String name) {
         this.name = name;
         this.code = "";
@@ -24,6 +23,13 @@ public class Station {
         this.name = name;
         this.code = code;
         this.activity = activity;
+    }
+
+    public Station(@NonNull String name, @NonNull String code, String activity, String error) {
+        this.name = name;
+        this.code = code;
+        this.activity = activity;
+        this.error = error;
     }
 
     public String name() {

@@ -9,19 +9,21 @@
     </style>
 
     <style name="ActivityStyle" parent="Widget.AppCompat.TextView">
-        <item name="android:textSize">20sp</item>
-        <!-- <item name="android:layout_margin">4dp</item> -->
-        <!-- <item name="android:padding">4dp</item> -->
-        <item name="textAllCaps">false</item>
-        <item name="android:textColor">@color/primary_dark</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
-    <style name="ErrorStyle" parent="Widget.AppCompat.TextView">
         <item name="android:textSize">100sp</item>
         <!-- <item name="android:layout_margin">4dp</item> -->
         <!-- <item name="android:padding">4dp</item> -->
-        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/activity_blue</item>
+        <item name="android:textStyle">normal</item>
+      <!-- <item name="android:fontFamily">@font/roboto_condensed_regular</item> -->
+        <item name="android:fontFamily">sans-serif-thin</item>
+
+    </style>
+
+    <style name="ErrorStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">20sp</item>
+        <!-- <item name="android:layout_margin">4dp</item> -->
+        <!-- <item name="android:padding">4dp</item> -->
+        <!-- <item name="textAllCaps">false</item> -->
         <item name="android:textColor">@color/primary_dark</item>
         <item name="android:textStyle">normal</item>
     </style>
