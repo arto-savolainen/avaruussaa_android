@@ -4,29 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/background_gradient">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:alpha="0.8"
+        android:contentDescription="@string/main_iv_background_image_content_description"
+        android:scaleType="centerCrop"
+        android:src="@drawable/revontuli_cropped_transparency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/main_tv_activity_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:gravity="center"
+        android:shadowColor="@color/black"
+        android:shadowDx="8"
+        android:shadowDy="8"
+        android:shadowRadius="8"
         android:text="@string/main_activity_title"
-        android:textColor="@color/purple"
+        android:textColor="@color/dark_purple"
         android:textSize="55sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.148" />
+        app:layout_constraintVertical_bias="0.148"
+        tools:ignore="TextContrastCheck" />
 
     <TextView
         android:id="@+id/main_tv_activity_unit"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="(nT/s)"
-        android:textColor="@color/purple"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_unit"
+        android:textColor="@color/faded_purple"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -40,7 +57,6 @@
         android:layout_marginTop="92dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="0"
         android:textColor="@color/primary_dark"
         android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,12 +70,13 @@
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="#00FFFFFF"
+        android:background="@color/transparent"
         android:contentDescription="@string/main_btn_settings_content_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/baseline_settings_24"
-        app:tint="@color/icon_grey" />
+        app:tint="@color/icon_grey"
+        tools:ignore="ImageContrastCheck" />
 
     <Button
         android:id="@+id/main_btn_station"
@@ -68,17 +85,24 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="92dp"
         android:backgroundTint="#00BC1515"
-        android:text="loading..."
+        android:fontFamily="monospace"
+        android:shadowColor="@color/black"
+        android:shadowDx="8"
+        android:shadowDy="8"
+        android:shadowRadius="4"
+        android:text="@string/main_loading_text"
         android:textColor="@color/dark_purple"
         android:textSize="26sp"
-        app:icon="@drawable/station_icon_large"
+        app:icon="@drawable/station_icon"
+        app:iconTint="@color/faded_purple"
         app:iconGravity="end"
-        app:iconTint="#CAC4D0"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_value" />
+        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_value"
+        tools:ignore="TextContrastCheck" />
 
-
+<!-- main_btn_station  app:iconTint="#CAC4D0"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

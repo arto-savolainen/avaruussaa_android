@@ -18,7 +18,6 @@ public class Station {
         this.code = code;
     }
 
-    // TODO: This constructor can be removed if I don't find a use for it
     public Station(@NonNull String name, @NonNull String code, String activity) {
         this.name = name;
         this.code = code;

@@ -29,20 +29,20 @@ public class MainModel extends AndroidViewModel {
         activityLiveData = savedStateHandle.getLiveData("ACTIVITY", "");
         errorLiveData = savedStateHandle.getLiveData("ERROR", "");
 
-        if (activityLiveData.getValue().length() == 0) {
-            activityLiveData.setValue(getApplication().getResources().getString(R.string.main_loading_text));
+        if (activityLiveData.getValue() != null && activityLiveData.getValue().length() == 0) {
+            activityLiveData.setValue(context.getString(R.string.main_loading_text));
         }
-        if (nameLiveData.getValue().length() == 0) {
-            nameLiveData.setValue(StationsData.getCurrentStationNameFromPreferences(context));
+        if (nameLiveData.getValue() != null && nameLiveData.getValue().length() == 0) {
+            nameLiveData.setValue(StationsData.getCurrentStationName(context));
         }
 
         registerStationChangeListener();
     }
 
     // Creates and registers a listener for changes to StationStore SharedPreferences
-    // Whenever the currently selected station changes, or a data update is indicated via changing the "refresh" key,
-    // fetches data for that station and sets MutableLiveData & savedStateHandle accordingly
-    public void registerStationChangeListener() {
+    // Whenever the currently selected station changes, or a data update is indicated via changing the value of the "refresh" entry,
+    // this method fetches data for that station and sets MutableLiveData and SavedState accordingly
+    private void registerStationChangeListener() {
         Context context = getApplication().getApplicationContext();
 
         SharedPreferences stationStore = context.getSharedPreferences("StationStore", Context.MODE_PRIVATE);
@@ -51,17 +51,18 @@ public class MainModel extends AndroidViewModel {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 Log.d(TAG, "onSharedPreferenceChanged: key: " + key);
 
-                // If the currently selected station has changed, fetch data for that station and update LiveData
+                // If the currently selected station has changed, get data for that station and update LiveData
                 if (key != null && key.equals("current_station_name")) {
-                    Station currentStation = StationsData.getStationFromPreferences(context, StationsData.getCurrentStationNameFromPreferences(context));
-
+                    Station currentStation = StationsData.getStation(context, StationsData.getCurrentStationName(context));
                     Log.d(TAG, "currentStation data fetched, here it is: " + currentStation);
-                    updateLiveDataAndSavedStateHandle(currentStation);
+                    updateLiveDataAndSavedState(currentStation);
                 }
 
+                // After UpdateWorker has finished updating data it changes the value of "refresh"
                 if (key != null && key.equals("refresh")) {
-                    Station currentStation = StationsData.getStationFromPreferences(context, StationsData.getCurrentStationNameFromPreferences(context));
-                    updateLiveDataAndSavedStateHandle(currentStation);
+                    Log.d(TAG, "Data refresh triggered, updating MutableLiveData and SavedState");
+                    Station currentStation = StationsData.getStation(context, StationsData.getCurrentStationName(context));
+                    updateLiveDataAndSavedState(currentStation);
                 }
             }
         };
@@ -69,14 +70,19 @@ public class MainModel extends AndroidViewModel {
         stationStore.registerOnSharedPreferenceChangeListener(listener);
     }
 
-    private void updateLiveDataAndSavedStateHandle(Station currentStation) {
-        Log.d(TAG, "updateLiveDataAndSavedStateHandle: updating LiveData and savedStateHandle. currentStation:" + currentStation);
-        nameLiveData.setValue(currentStation.name());
-        activityLiveData.setValue(currentStation.activity());
-        errorLiveData.setValue(currentStation.error());
-        savedStateHandle.set("NAME", currentStation.name());
-        savedStateHandle.set("ACTIVITY", currentStation.activity());
-        savedStateHandle.set("ERROR", currentStation.error());
+    private void updateLiveDataAndSavedState(Station currentStation) {
+        try {
+            Log.d(TAG, "updateLiveDataAndSavedStateHandle: updating LiveData and savedStateHandle. currentStation:" + currentStation);
+            nameLiveData.setValue(currentStation.name());
+            activityLiveData.setValue(currentStation.activity());
+            errorLiveData.setValue(currentStation.error());
+            savedStateHandle.set("NAME", currentStation.name());
+            savedStateHandle.set("ACTIVITY", currentStation.activity());
+            savedStateHandle.set("ERROR", currentStation.error());
+        }
+        catch (Exception e) {
+            Log.d(TAG, "updateLiveDataAndSavedState: EXCEPTION: " + e);
+        }
     }
 
     @Override

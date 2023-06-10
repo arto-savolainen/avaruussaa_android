@@ -13,7 +13,7 @@
         app:useSimpleSummaryProvider="true" />
     <SwitchPreferenceCompat
         app:defaultValue="true"
-        app:icon="@drawable/baseline_notifications_24"
+        app:icon="@drawable/baseline_notifications_active_24"
         app:key="notifications"
         app:summaryOff="@string/settings_notifications_summary_off"
         app:summaryOn="@string/settings_notifications_summary_on"

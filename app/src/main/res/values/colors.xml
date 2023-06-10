@@ -4,8 +4,17 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary_dark">#FF707070</color>
     <color name="background">#FF151515</color>
-    <color name="dark_purple">#FF714d9f</color>
+    <color name="faded_purple">#FF714d9f</color>
+    <color name="dark_purple">#FF630295</color>
+    <color name="darker_purple">#FF530077</color>
     <color name="purple">#FF8300f3</color>
     <color name="icon_grey">#FF707070</color>
     <color name="activity_blue">#FF1717FC</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="transparent_purple">#0F8300f3</color>
+    <color name="transparent_dark_purple">#1F714d9f</color>
+    <color name="transparent_primary">#0D707070</color>
+    <color name="transparent_aurora_green">#0D64705A</color>
+    <color name="transparent_darker_purple">#0D530077</color>
+    <color name="aurora_green">#FF64705A</color>
 </resources>

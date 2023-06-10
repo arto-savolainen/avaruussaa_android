@@ -23,37 +23,33 @@ public class MainActivity extends AppCompatActivity {
         ImageButton settingsBtn = findViewById(R.id.main_btn_settings);
         Button stationBtn = findViewById((R.id.main_btn_station));
 
-        Log.d("mytag", "MAIN ACTIVITY ONCREATE");
-
-        // Create the observer which updates main_btn_station when the current station changes
+        // Create the observer which updates main_btn_station Button when the current station changes
         viewModel.getName().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newName) {
-                Log.d("mytag", "MAIN ACTIVITY!!!!!!!!! CURRENT STATION CHANGES");
                 stationBtn.setText(newName);
             }
         });
 
-        // Create the observer which updates activityView when the activity for current station changes
+        // Create the observer which updates main_tv_activity_value TextView when the activity for current station changes
         viewModel.getActivity().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newActivity) {
-                Log.d("mytag", "MAIN ACTIVITY!!!!!!!!! ACTIVITY CHANGES");
                 activityView.setText(newActivity);
 
-                if (!newActivity.contains("loading")) {
-                    activityView.setTextAppearance(R.style.ActivityStyle);
+                if (!newActivity.contains(getResources().getString(R.string.main_loading_text))) {
+                    activityView.setTextAppearance(R.style.activity_big);
                 }
             }
         });
 
-        // Create the observer which updates activityView with an error msg if necessary
+        // Create the observer which updates main_tv_activity_value TextView with an error msg if necessary
         viewModel.getError().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newError) {
                 if (newError.length() > 0) {
                     activityView.setText(newError);
-                    activityView.setTextAppearance(R.style.ErrorStyle);
+                    activityView.setTextAppearance(R.style.error_grey);
                 }
             }
         });
@@ -63,6 +59,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent startIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(startIntent);
+            }
+        });
+
+        // Navigate to StationsActivity when user presses the station button
+        stationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent startIntent = new Intent(getApplicationContext(), StationsActivity.class);
                 startActivity(startIntent);
             }
         });

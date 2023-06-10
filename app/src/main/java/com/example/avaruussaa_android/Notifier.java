@@ -16,6 +16,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class Notifier {
+    // TODO: Use notificationId to update and remove a notification. Or just leave SetAutoCancel on
+    // atm most of this class is copied from the documentation. TODO Need to set up permissions for notifications to work.
     private static int notificationId = 42;
 
     public static void sendNotification(@NonNull Context context, @NonNull String stationName, @NonNull String activity) {
@@ -30,7 +32,7 @@ public class Notifier {
 
             Resources resources = context.getResources();
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(R.string.notification_channel_name))
-                .setSmallIcon(R.drawable.station_icon_large)
+                .setSmallIcon(R.drawable.station_icon)
                 .setContentTitle(resources.getString(R.string.notification_title))
                 .setContentText(resources.getString(R.string.notification_body))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"))
