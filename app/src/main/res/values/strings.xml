@@ -6,6 +6,7 @@
 
     <!-- Main activity -->
     <string name="main_activity_title">ACTIVITY</string>
+    <string name="main_activity_unit">(nT/s)</string>
     <string name="main_loading_text">loading...</string>
     <string name="main_btn_settings_content_description">To settings screen</string>
     <string name="main_iv_background_image_content_description">Background image showing northern lights above the city lights</string>
@@ -17,6 +18,7 @@
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_notifications_summary_off">Notifications disabled</string>
     <string name="settings_notifications_summary_on">Notifications enabled</string>
+    <string name="settings_brightness_title">Mood</string>
     <string name="settings_btn_back_content_description">Back to previous screen</string>
 
     <!-- Stations activity -->
@@ -33,6 +35,4 @@
     <string name="notification_channel_description">Notifications for northern lights activity</string>
     <string name="notification_title">Northern lights likely</string>
     <string name="notification_body">"Magnetic activity @ %1$s: %2$s nT/s"</string>
-    <string name="activity_unit">(nT/s)</string>
-
 </resources>

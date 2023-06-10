@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
         final MainModel viewModel = new ViewModelProvider(this).get(MainModel.class);
         TextView activityView = findViewById(R.id.main_tv_activity_value);
         ImageButton settingsBtn = findViewById(R.id.main_btn_settings);
-        Button stationBtn = findViewById((R.id.main_btn_station));
+        Button stationBtn = findViewById(R.id.main_btn_station);
+        ImageView backgroundImg = findViewById(R.id.main_iv_background);
 
         // Create the observer which updates main_btn_station Button when the current station changes
         viewModel.getName().observe(this, new Observer<String>() {
@@ -37,7 +39,11 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(String newActivity) {
                 activityView.setText(newActivity);
 
-                if (!newActivity.contains(getResources().getString(R.string.main_loading_text))) {
+                if (newActivity.contains(getResources().getString(R.string.main_loading_text))) {
+                    // TODO: Try to match loading text height with activity number, adjust TextView layout?
+//                    activityView.setTextAppearance(R.style.loading);
+                }
+                else  {
                     activityView.setTextAppearance(R.style.activity_big);
                 }
             }
@@ -50,6 +56,18 @@ public class MainActivity extends AppCompatActivity {
                 if (newError.length() > 0) {
                     activityView.setText(newError);
                     activityView.setTextAppearance(R.style.error_grey);
+                }
+            }
+        });
+
+        viewModel.getBrightness().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer newBrightness) {
+                if (newBrightness >= 0 && newBrightness <= 100) {
+                    backgroundImg.setImageAlpha((int) Math.round(newBrightness * 2.55));
+                }
+                else {
+                    backgroundImg.setImageAlpha((int) Math.round(90 * 2.55)); // This should never be reached.
                 }
             }
         });

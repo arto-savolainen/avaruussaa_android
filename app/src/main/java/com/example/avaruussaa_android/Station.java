@@ -1,8 +1,10 @@
 package com.example.avaruussaa_android;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
-public class Station {
+public class Station implements Cloneable {
     private final String name;
     private final String code;
     private String activity = "loading...";
@@ -54,6 +56,19 @@ public class Station {
 
     public void setError(String newError) {
         error = newError;
+    }
+
+    @NonNull
+    @Override
+    public Station clone() {
+        Station newStation = null;
+        try {
+            newStation = (Station) super.clone();
+        } catch (CloneNotSupportedException e) {
+            Log.e("stationtag", "CloneNotSupportedException");
+        }
+
+        return newStation != null ? newStation : new Station("error", "error");
     }
 
     @NonNull

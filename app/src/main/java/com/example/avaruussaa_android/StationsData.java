@@ -9,19 +9,19 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-// This is our data store Singleton which holds information about the magnetic activity and error state of each station.
-// The data it holds is updated by DataFetchWorker.
+// This is our data store which holds information about the magnetic activity and error state of each station.
+// The data it holds is updated by UpdateWorker. If the data is garbage collected it will be retrieved from SharedPreferences.
 // TODO: MAYBE STATIONSDATA EXTENDS APPLICATION? Is that a good idea? I don't know
-// TODO: Write the list of stations at once to avoid SharedPreferences overhead on every write
+// TODO: Clean up this file
 public class StationsData {
-    // TODO: Clean up this file
     // stationsList caches data that is written to SharedPreferences. Cache is always written first so should be up-to-date.
-    private static List<Station> stationsList = null;
+    private static ArrayList<Station> stationsList = null;
+    private static String currentStationName = null;
     private static final String TAG = "stationsdatatag";
-
 
     // This is a static class, constructor is private.
     private StationsData() {
@@ -31,6 +31,7 @@ public class StationsData {
     // and update data held by subscribers, i.e. the MainModel instance which updates the main view.
     public static void setCurrentStation(@NonNull Context context, String stationName) {
         Log.d(TAG, "IN SETCURRENTSTATION, parameter stationName: " + stationName);
+        currentStationName = stationName;
         StationsData.writeStringToPreferences(context, "current_station_name", stationName);
     }
 
@@ -39,88 +40,64 @@ public class StationsData {
         if (stationsList != null) {
             for (Station station : stationsList) {
                 if (station.name().equals(stationName) && !station.activity().contains(context.getString(R.string.main_loading_text))) {
-                    Log.d(TAG, "findStation: hit cache, returning station: " + station);
+                    Log.d(TAG, "findStation: CACHE HIT, returning station: " + station);
                     return station;
                 }
             }
         }
 
-        Log.d(TAG, "findStation: NO cache hit, returning sharedprefs");
+        Log.d(TAG, "findStation: CACHE MISS, returning sharedprefs");
         return getStationFromSharedPreferences(context, stationName);
     }
 
-    // maybe used later?
-//    public static void setStationData(@NonNull Context context, Station station) {
-//        // Write data to cache first.
-//        if (stationsList != null) {
-//            Station stationToEdit = findStationToEdit(context, station.name());
-//            Log.d(TAG, "setStationData: station: " + station + " writing to cache of station: " + stationToEdit);
-//            stationToEdit.setActivity(station.activity());
-//            stationToEdit.setError(station.error());
-//
-//            Log.d(TAG, "setStationData: END OF CACHE WRITE stationToEdit: " + stationToEdit + " station: " + station);
-//        }
-//
-//        List<Pair<String, String>> stationPrefList = List.of(
-//            new Pair<>(station.name() + "_code", station.code()),
-//            new Pair<>(station.name() + "_activity", station.activity()),
-//            new Pair<>(station.name() + "_error", station.error())
-//        );
-//
-//        StationsData.writeListToPreferences(context, stationPrefList);
-//    }
-
-    public static void setStationActivity(@NonNull Context context, String stationName, String activity) {
-        Station stationToEdit = findStationToEdit(context, stationName);
-
-        // Write data to cache first.
-        if (stationsList != null) {
-            Log.d(TAG, "setStationACTIVITY: writing to station: " + stationToEdit);
-            stationToEdit.setActivity(activity);
-
-            Log.d(TAG, "setStationACTIVITY: END OF CACHE WRITE stationToEdit: " + stationToEdit);
+    // This function takes a list containing Stations and writes the data to the cache and SharedPreferences.
+    public static void setStationsData(@NonNull Context context, List<Station> stationsData) {
+        if (stationsData.size() != 12) {
+            Log.e(TAG, "setStationsData: ERROR invalid list size");
+            return;
         }
 
-        List<Pair<String, String>> stationPrefList = List.of(
-            new Pair<>(stationName + "_code", stationToEdit.code()),
-            new Pair<>(stationName + "_activity", stationToEdit.activity()),
-            new Pair<>(stationName + "_error", stationToEdit.error())
-        );
-
-        StationsData.writeListToPreferences(context, stationPrefList);
+        // Create a deep copy of the list so we don't reference data created by UpdateWorker. Data is now cached.
+        stationsList = copyStationsList(stationsData);
+        writeStationsToPreferences(context, stationsList);
     }
 
-    public static void setStationError(@NonNull Context context, String stationName, String error) {
-        Station stationToEdit = findStationToEdit(context, stationName);
-
-        // Write data to cache first.
-        if (stationsList != null) {
-            Log.d(TAG, "setStationERROR: writing to station: " + stationToEdit);
-            stationToEdit.setError(error);
-
-            Log.d(TAG, "setStationERROR: END OF CACHE WRITE stationToEdit: " + stationToEdit);
+    private static ArrayList<Station> copyStationsList(List<Station> stationsData) {
+        ArrayList<Station> newList = new ArrayList<>();
+        for (Station station : stationsData) {
+            newList.add(station.clone());
         }
 
-        List<Pair<String, String>> stationPrefList = List.of(
-            new Pair<>(stationName + "_code", stationToEdit.code()),
-            new Pair<>(stationName + "_activity", stationToEdit.activity()),
-            new Pair<>(stationName + "_error", stationToEdit.error())
-        );
-
-        StationsData.writeListToPreferences(context, stationPrefList);
+        return newList;
     }
 
-    private static Station findStationToEdit(@NonNull Context context, @NonNull String stationName) {
-        if (stationsList != null) {
-            for (Station station : stationsList) {
-                if (station.name().equals(stationName)) {
-                    Log.d(TAG, "findStationToEdit: returning station: " + station);
-                    return station;
-                }
-            }
+    // Takes a list of stations, converts it to key-value Pairs and writes them to "StationStore" SharedPreferences.
+    private static void writeStationsToPreferences(@NonNull Context context, @NonNull List<Station> stations) {
+        Log.d(TAG, "writeStationsToPreferences: stations: " + stations);
+        List<Pair<String, String>> stationPrefList = new ArrayList<>();
+
+        for (Station station : stations) {
+            stationPrefList.add(new Pair<>(station.name() + "_code", station.code()));
+            stationPrefList.add(new Pair<>(station.name() + "_activity", station.activity()));
+            stationPrefList.add(new Pair<>(station.name() + "_error", station.error()));
         }
 
-        return new Station("error", "error"); // This should never happen.
+        writeListToPreferences(context, stationPrefList);
+    }
+
+    // General use function for writing a List of key-value Pairs to StationStore SharedPreferences
+    @SuppressLint("ApplySharedPref")
+    public static void writeListToPreferences(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
+        Log.d(TAG, "writeListToPreferences prefs: " + prefs);
+        SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = stationStore.edit();
+
+        for (Pair<String, String> p : prefs) {
+            editor.putString(p.first, p.second);
+        }
+
+        editor.commit();
+//        editor.apply(); // Could test if apply / commit makes any difference in app responsiveness.
     }
 
     // Returns a list of station names and codes. Activity and error fields are empty.
@@ -132,7 +109,7 @@ public class StationsData {
         }
 
         Log.d(TAG, "in getDefaultStationListFromResources: ");
-        List<Station> stations = new ArrayList<>();
+        ArrayList<Station> stations = new ArrayList<>();
         Resources resources = context.getResources();
         String[] names = resources.getStringArray(R.array.station_names);
         String[] codes = resources.getStringArray(R.array.station_codes);
@@ -161,30 +138,19 @@ public class StationsData {
 //        editor.apply();
     }
 
-    // Takes a list of key-value Pairs and writes them to "StationStore" SharedPreferences.
-    @SuppressLint("ApplySharedPref")
-    public static void writeListToPreferences(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
-        Log.d(TAG, "writeListToPreferences prefs: " + prefs);
-        SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = stationStore.edit();
-
-        for (Pair<String, String> p : prefs) {
-            editor.putString(p.first, p.second);
+    public static String getCurrentStationName(@NonNull Context context) {
+        if (currentStationName != null) {
+            Log.d(TAG, "CACHE HIT, returning current station name from CACHE");
+            return currentStationName;
         }
 
-        editor.commit();
-//        editor.apply(); // Could test if apply / commit makes any difference in app responsiveness.
-    }
-
-    public static String getCurrentStationName(@NonNull Context context) {
-        Log.d(TAG, "Getting current station name from preferences");
-
+        Log.d(TAG, "CACHE MISS, getting current station name from PREFERENCES");
         SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
         return stationStore.getString("current_station_name", context.getResources().getString(R.string.default_station_name));
     }
 
     // This function changes the value of the "refresh" entry in SharedPreferences, thus triggering
-    // onSharedPreferenceChanged() in MainModel to let the main view know data has been updated.
+    // onSharedPreferenceChanged() in MainModel and letting the main view know that data has been updated.
     public static void notifyUpdateComplete(@NonNull Context context) {
         SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
         Boolean refresh = stationStore.getBoolean("refresh", true);
@@ -204,8 +170,20 @@ public class StationsData {
         return getStationFromSharedPreferences(context, stationName);
     }
 
+    public static Station getCurrentStation(@NonNull Context context) {
+        String currentStationName = getCurrentStationName(context);
+
+        if (stationsList != null) {
+            return findStationData(context, currentStationName);
+        }
+
+        return getStationFromSharedPreferences(context, currentStationName);
+    }
+
     private static Station getStationFromSharedPreferences(@NonNull Context context, @NonNull String stationName) {
-        String stationCode = findStationCode(stationName);
+        // By finding the station's code we can form a valid Station even if it's not found in StationStore.
+        // This shouldn't be required I think, but it's here for safety.
+        String stationCode = findStationCode(context, stationName);
 
         SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
         String code = stationStore.getString(stationName + "_code", stationCode);
@@ -215,7 +193,8 @@ public class StationsData {
         return new Station(stationName, code, activity, error);
     }
 
-    private static String findStationCode(String stationName) {
+    // Finds a station's code from the cache, or if that does not exist, arrays.xml
+    private static String findStationCode(@NonNull Context context, @NonNull String stationName) {
         if (stationsList != null) {
             for (Station station : stationsList) {
                 if (station.name().equals(stationName)) {
@@ -224,6 +203,12 @@ public class StationsData {
             }
         }
 
-        return "ERROR_CODE_NOT_FOUND"; // This should never happen.
+        for (Station station : getDefaultStationsList(context)) {
+            if (station.name().equals(stationName)) {
+                return station.code();
+            }
+        }
+
+        return "ERROR_CODE_NOT_FOUND"; // This should never be reached.
     }
 }

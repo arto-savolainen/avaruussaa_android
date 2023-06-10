@@ -21,6 +21,10 @@ public class InitApp extends Application {
         // Always use night theme.
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
+        // TODO NOTE: "what you dont hear, is that the application can be killed by the SO without user interaction (to release memory for foreground apps)
+        //  and in this scenario when the user tries to come back to your app it will restart from the last used activity and not from the launcher activity"
+        // from https://stackoverflow.com/questions/52288361/does-android-kill-singleton-in-order-to-free-memory this requires testing.
+
         // Start periodic work i.e. data fetching at intervals.
         WorkController.initWork(getApplicationContext());
     }

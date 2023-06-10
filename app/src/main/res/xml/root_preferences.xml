@@ -18,6 +18,12 @@
         app:summaryOff="@string/settings_notifications_summary_off"
         app:summaryOn="@string/settings_notifications_summary_on"
         app:title="@string/settings_notifications_title" />
-
+    <SeekBarPreference
+        android:key="brightness"
+        android:title="@string/settings_brightness_title"
+        app:showSeekBarValue="false"
+        app:defaultValue="90"
+        android:max="100"
+        app:seekBarIncrement="1" />
 
 </PreferenceScreen>

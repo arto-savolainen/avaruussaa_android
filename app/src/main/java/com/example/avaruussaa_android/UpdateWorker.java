@@ -10,6 +10,9 @@ import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -22,7 +25,6 @@ public class UpdateWorker extends Worker {
         super(context, params);
     }
 
-
     @NonNull
     @WorkerThread
     @Override
@@ -30,8 +32,7 @@ public class UpdateWorker extends Worker {
         Log.d(TAG, "DOING WORK");
         String responseBody = fetchData();
         Context context = getApplicationContext();
-
-        // TODO: REFACTOR TO BUILD STATIONS LIST AND WRITE IT TO PREFS ALL AT ONCE, COULD BE FASTER
+        ArrayList<Station> stationsData = new ArrayList<>();
 
         // Find station data from the HTML string and update the activity for each station.
         for (Station station : StationsData.getDefaultStationsList(context)) {
@@ -68,37 +69,33 @@ public class UpdateWorker extends Worker {
             if (activity.contains("null")) {
                 // If activity was null, use activity previous to latest. This may also be null but most often contains valid data.
                 if (previousActivity.contains("null")) {
-                    setError(station.name(), getApplicationContext().getString(R.string.error_station_null, station.name()));
+                    stationsData.add(createStation(station, "", context.getString(R.string.error_station_null, station.name())));
                 } else {
-                    setActivity(station.name(), previousActivity);
+                    stationsData.add(createStation(station, previousActivity, ""));
                 }
             } else {
-                setActivity(station.name(), activity);
+                stationsData.add(createStation(station, activity, ""));
             }
-
-            Log.d(TAG, "STATION AT END OF FOR LOOP: " + station);
         }
 
-        Log.d(TAG, "doWork: end of station loop");
+        Log.d(TAG, "doWork: end of loop, stationsData:" + stationsData);
+
+        StationsData.setStationsData(context, stationsData);
+
         // This writes to SharedPreferences and fires the listener function in MainModel which updates the main view.
-        StationsData.notifyUpdateComplete(context);
+        StationsData.notifyUpdateComplete(context); // TODO: MOVE THIS TO STATIONSDATA
+
+        // Get current station here, then compare its activity to the threshold from settings and send notification if activity >= threshold
+//        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String notificationThreshold = settings.getString("threshold", "");
+//        Log.d(TAG, "setActivity: notificationThreshold: " + notificationThreshold);
 //        Notifier.sendNotification(context,"debugstation_lol", "42...");
 
         return Result.success();
     }
 
-    private void setActivity(String stationName, String activity) {
-//        station.setActivity(activity);
-        StationsData.setStationActivity(getApplicationContext(), stationName, activity);
-
-//        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//        String notificationThreshold = settings.getString("threshold", "");
-//        Log.d(TAG, "setActivity: notificationThreshold: " + notificationThreshold);
-    }
-
-    private void setError(String stationName, String error) {
-//        station.setError(error);
-        StationsData.setStationError(getApplicationContext(), stationName, error);
+    private Station createStation(@NonNull Station station, @NonNull String activity, @NonNull String error) {
+        return new Station(station.name(), station.code(), activity, error);
     }
 
     private String fetchData() {

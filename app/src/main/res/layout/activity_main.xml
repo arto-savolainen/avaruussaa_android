@@ -8,9 +8,10 @@
     android:background="@drawable/background_gradient">
 
     <ImageView
+        android:id="@+id/main_iv_background"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:alpha="0.8"
+        android:alpha="0.9"
         android:contentDescription="@string/main_iv_background_image_content_description"
         android:scaleType="centerCrop"
         android:src="@drawable/revontuli_cropped_transparency"
@@ -42,7 +43,11 @@
         android:id="@+id/main_tv_activity_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/activity_unit"
+        android:shadowColor="@color/black"
+        android:shadowDx="7"
+        android:shadowDy="7"
+        android:shadowRadius="2"
+        android:text="@string/main_activity_unit"
         android:textColor="@color/faded_purple"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
