@@ -10,6 +10,9 @@
     <string name="main_loading_text">loading...</string>
     <string name="main_btn_settings_content_description">To settings screen</string>
     <string name="main_iv_background_image_content_description">Background image showing northern lights above the city lights</string>
+    <string name="main_probability_text_quiet">All quiet</string>
+    <string name="main_probability_text_low">Low probability</string>
+    <string name="main_probability_text_high">High probability</string>
 
     <!-- Settings activity -->
     <string name="title_activity_settings">Settings</string>
@@ -17,8 +20,10 @@
     <string name="settings_interval_title">Notification min. interval (hours)</string>
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_notifications_summary_off">Notifications disabled</string>
+    <string name="settings_notifications_summary_no_permission">Notifications disabled, grant permission to enable</string>
     <string name="settings_notifications_summary_on">Notifications enabled</string>
     <string name="settings_brightness_title">Mood</string>
+    <string name="settings_toast_permission">Please grant Notification permission to enable notifications.</string>
     <string name="settings_btn_back_content_description">Back to previous screen</string>
 
     <!-- Stations activity -->
@@ -31,7 +36,7 @@
     
     <!-- Notifications-->
     <string name="notification_channel_id">activity_channel</string>
-    <string name="notification_channel_name">Activity notifications</string>
+    <string name="notification_channel_name">Activity Notifications</string>
     <string name="notification_channel_description">Notifications for northern lights activity</string>
     <string name="notification_title">Northern lights likely</string>
     <string name="notification_body">"Magnetic activity @ %1$s: %2$s nT/s"</string>

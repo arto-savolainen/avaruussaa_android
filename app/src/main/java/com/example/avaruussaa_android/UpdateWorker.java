@@ -1,17 +1,14 @@
 package com.example.avaruussaa_android;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
-import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,7 +44,7 @@ public class UpdateWorker extends Worker {
             // Length is also 1 if the data fetch routine failed and returned an empty string, in which case all stations will be set to an error state.
             if (splitResponseBody.length < 2) {
                 // Set station error message indicating data was not found and loop to the next station.
-                station.setError(context.getString(R.string.error_station_disabled, station.name()));
+                stationsData.add(createStation(station, "", context.getString(R.string.error_station_disabled, station.name())));
                 continue;
             }
 
@@ -82,16 +79,38 @@ public class UpdateWorker extends Worker {
 
         StationsData.setStationsData(context, stationsData);
 
-        // This writes to SharedPreferences and fires the listener function in MainModel which updates the main view.
-        StationsData.notifyUpdateComplete(context); // TODO: MOVE THIS TO STATIONSDATA
+        checkConditionsAndNotify();
 
-        // Get current station here, then compare its activity to the threshold from settings and send notification if activity >= threshold
-//        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//        String notificationThreshold = settings.getString("threshold", "");
-//        Log.d(TAG, "setActivity: notificationThreshold: " + notificationThreshold);
-//        Notifier.sendNotification(context,"debugstation_lol", "42...");
+
+
+
+
 
         return Result.success();
+    }
+
+    // Calls Notifier.sendNotification() if conditions regarding the currently selected station's magnetic activity are met.
+    // 1) Activity must meet or exceed the threshold set in app settings.
+    // 2) Time since the last notification must be less than the notification interval set in app settings.
+    private void checkConditionsAndNotify() {
+        Context context = getApplicationContext();
+
+        AppSettings settings = new AppSettings();
+        Boolean notificationsEnabled = settings.getNotificationsEnabled();
+        double notificationThreshold = settings.getNotificationThreshold();
+        Station currentStation = StationsData.getCurrentStation(context);
+
+        //TODO: Implement interval check: Write datetime to prefs, check if datetime.now() - lastdatetime > interval -> sendNotification()
+
+        try {
+            if (notificationsEnabled && Double.parseDouble(currentStation.activity()) >= notificationThreshold) {
+                Notifier.sendNotification(currentStation.name(), currentStation.activity());
+            }
+        }
+        catch (NumberFormatException e) {
+            Log.e(TAG, "doWork: EXCEPTION: Parsing current station activity to double failed, e: " + e);
+            e.printStackTrace();
+        }
     }
 
     private Station createStation(@NonNull Station station, @NonNull String activity, @NonNull String error) {
@@ -112,9 +131,6 @@ public class UpdateWorker extends Worker {
             try (Response response = client.newCall(request).execute()) {
                 // If response.body() is null return empty string.
                 responseBody = response.body() != null ? response.body().string() : "";
-
-                // Write response body to a file for debugging purposes.
-                Utils.writeToFile(getApplicationContext(), "response.html", responseBody);
 
                 return responseBody;
             }

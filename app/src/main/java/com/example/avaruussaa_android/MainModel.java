@@ -15,37 +15,56 @@ import androidx.preference.PreferenceManager;
 public class MainModel extends AndroidViewModel {
     private static final String TAG = "mainmodeltag";
     private final SavedStateHandle savedStateHandle;
-    private final MutableLiveData<String> nameLiveData;
-    private final MutableLiveData<String> activityLiveData;
-    private final MutableLiveData<String> errorLiveData;
-    private final MutableLiveData<Integer> brightnessLiveData;
+    private MutableLiveData<String> nameLiveData;
+    private MutableLiveData<String> activityLiveData;
+    private MutableLiveData<String> errorLiveData;
+    private MutableLiveData<Integer> brightnessLiveData;
     private final String NAME_KEY = "NAME";
     private final String ACTIVITY_KEY = "ACTIVITY";
     private final String ERROR_KEY = "ERROR";
     private final String BRIGHTNESS_KEY = "BRIGHTNESS";
-    private final int DEFAULT_BRIGHTNESS = 90;
+    private int DEFAULT_BRIGHTNESS;
     SharedPreferences.OnSharedPreferenceChangeListener stationListener = null; // Must store a strong reference to listener to prevent GC.
     SharedPreferences.OnSharedPreferenceChangeListener brightnessListener = null;
 
     public MainModel(Application application, SavedStateHandle savedStateHandle) {
         super(application);
+        Log.d(TAG, "MainModel: IN MAINMODEL CONSTRUCTOR");
         this.savedStateHandle = savedStateHandle;
+        DEFAULT_BRIGHTNESS = getApplication().getApplicationContext().getResources().getInteger(R.integer.default_brightness);
 
-        Context context = getApplication().getApplicationContext();
+        initializeLiveData();
+        registerStationChangeListener();
+        registerBrightnessChangeListener();
+//        synchronizeTimer(); // TODO: synchronizeTimer runs / returns / something a timer that has its time remaining retrieved from WorkController. This timer executes code updating the timer string in a MutableLiveData every second.
+    }
+
+    // Initializes MutableLiveData from SavedState, or if SavedState is empty retrieves state from StationsData.
+    private void initializeLiveData() {
         nameLiveData = savedStateHandle.getLiveData(NAME_KEY, "");
         activityLiveData = savedStateHandle.getLiveData(ACTIVITY_KEY, "");
         errorLiveData = savedStateHandle.getLiveData(ERROR_KEY, "");
         brightnessLiveData = savedStateHandle.getLiveData(BRIGHTNESS_KEY, DEFAULT_BRIGHTNESS);
 
+
+        Log.d(TAG, "LIVEDATA VALUES FROM SAVEDSTATE: name: " + nameLiveData.getValue() + ", activity: " + activityLiveData.getValue() + ", error: " + errorLiveData.getValue() );
+
+        Context context = getApplication().getApplicationContext();
+
+        if (errorLiveData.getValue() != null && errorLiveData.getValue().length() == 0) {
+            errorLiveData.setValue((StationsData.getCurrentStation(context).error()));
+        }
         if (activityLiveData.getValue() != null && activityLiveData.getValue().length() == 0) {
-            activityLiveData.setValue(context.getString(R.string.main_loading_text));
+            if (StationsData.isInitialized()) {
+                activityLiveData.setValue(StationsData.getCurrentStation(context).activity());
+            }
+            else {
+                activityLiveData.setValue(context.getString(R.string.main_loading_text));
+            }
         }
         if (nameLiveData.getValue() != null && nameLiveData.getValue().length() == 0) {
             nameLiveData.setValue(StationsData.getCurrentStationName(context));
         }
-
-        registerStationChangeListener();
-        registerBrightnessChangeListener();
     }
 
     // Creates and registers a listener for changes to StationStore SharedPreferences.
@@ -84,14 +103,14 @@ public class MainModel extends AndroidViewModel {
     private void registerBrightnessChangeListener() {
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication().getApplicationContext());
-            // Initialize brightness from SharedPreferences on app start
+            // Initialize brightness from SharedPreferences on app start.
             brightnessLiveData.setValue(prefs.getInt("brightness", DEFAULT_BRIGHTNESS));
 
             brightnessListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences p, String key) {
                     Log.d(TAG, "onSharedPreferenceChanged: key: " + key);
-                    if (key != null && key.equals("brightness")) { // key not to be confused with BRIGHTNESS_KEY
+                    if (key != null && key.equals("brightness")) { // key not to be confused with MutableLiveData key BRIGHTNESS_KEY
                         int newValue = p.getInt("brightness", DEFAULT_BRIGHTNESS);
                         brightnessLiveData.setValue(newValue);
                         savedStateHandle.set(BRIGHTNESS_KEY, newValue);

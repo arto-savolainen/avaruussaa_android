@@ -24,7 +24,7 @@ public class StationsActivity extends AppCompatActivity {
         StationsGridAdapter adapter = new StationsGridAdapter(this, stationsList);
         stationsGrid.setAdapter(adapter);
 
-        // Finish activity i.e. go back to main activity when user presses the back arrow button on top of the screen.
+        // Finish activity i.e. go back to main activity when user presses the back arrow button.
         ImageButton backBtn = findViewById(R.id.stations_btn_back);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override

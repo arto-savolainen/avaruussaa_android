@@ -9,7 +9,6 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +20,7 @@ public class StationsData {
     // stationsList caches data that is written to SharedPreferences. Cache is always written first so should be up-to-date.
     private static ArrayList<Station> stationsList = null;
     private static String currentStationName = null;
+    private static Boolean initialized = false;
     private static final String TAG = "stationsdatatag";
 
     // This is a static class, constructor is private.
@@ -50,6 +50,10 @@ public class StationsData {
         return getStationFromSharedPreferences(context, stationName);
     }
 
+    public static Boolean isInitialized() {
+        return initialized;
+    }
+
     // This function takes a list containing Stations and writes the data to the cache and SharedPreferences.
     public static void setStationsData(@NonNull Context context, List<Station> stationsData) {
         if (stationsData.size() != 12) {
@@ -60,6 +64,11 @@ public class StationsData {
         // Create a deep copy of the list so we don't reference data created by UpdateWorker. Data is now cached.
         stationsList = copyStationsList(stationsData);
         writeStationsToPreferences(context, stationsList);
+
+        initialized = true;
+
+        // This writes to SharedPreferences and fires the listener function in MainModel which updates the main view.
+        StationsData.notifyUpdateComplete(context);
     }
 
     private static ArrayList<Station> copyStationsList(List<Station> stationsData) {
@@ -146,7 +155,8 @@ public class StationsData {
 
         Log.d(TAG, "CACHE MISS, getting current station name from PREFERENCES");
         SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
-        return stationStore.getString("current_station_name", context.getResources().getString(R.string.default_station_name));
+        currentStationName = stationStore.getString("current_station_name", context.getResources().getString(R.string.default_station_name));
+        return currentStationName;
     }
 
     // This function changes the value of the "refresh" entry in SharedPreferences, thus triggering
@@ -177,6 +187,8 @@ public class StationsData {
             return findStationData(context, currentStationName);
         }
 
+        // This shouldn't be reached given how the program is currently structured.
+        // In practice getCurrentStation() is never called before the cache is initialized.
         return getStationFromSharedPreferences(context, currentStationName);
     }
 

@@ -14,7 +14,7 @@
         android:alpha="0.9"
         android:contentDescription="@string/main_iv_background_image_content_description"
         android:scaleType="centerCrop"
-        android:src="@drawable/revontuli_cropped_transparency"
+        android:src="@drawable/revontuli_cropped_transparency_brightness_plus_15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,7 +58,7 @@
     <TextView
         android:id="@+id/main_tv_activity_value"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_marginTop="92dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
@@ -92,15 +92,15 @@
         android:backgroundTint="#00BC1515"
         android:fontFamily="monospace"
         android:shadowColor="@color/black"
-        android:shadowDx="8"
-        android:shadowDy="8"
+        android:shadowDx="4"
+        android:shadowDy="4"
         android:shadowRadius="4"
         android:text="@string/main_loading_text"
         android:textColor="@color/dark_purple"
         android:textSize="26sp"
         app:icon="@drawable/station_icon"
-        app:iconTint="@color/faded_purple"
         app:iconGravity="end"
+        app:iconTint="@color/faded_purple"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -108,6 +108,22 @@
         app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_value"
         tools:ignore="TextContrastCheck" />
 
-<!-- main_btn_station  app:iconTint="#CAC4D0"-->
+    <TextView
+        android:id="@+id/main_tv_probability"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="11dp"
+        android:fontFamily="monospace"
+        android:shadowColor="@color/black"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="2"
+        android:text="@string/main_probability_text_quiet"
+        app:layout_constraintBottom_toTopOf="@+id/main_btn_station"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_tv_activity_value" />
+
+    <!-- main_btn_station  app:iconTint="#CAC4D0"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

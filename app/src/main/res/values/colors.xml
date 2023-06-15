@@ -14,7 +14,10 @@
     <color name="transparent_purple">#0F8300f3</color>
     <color name="transparent_dark_purple">#1F714d9f</color>
     <color name="transparent_primary">#0D707070</color>
-    <color name="transparent_aurora_green">#0D64705A</color>
+    <color name="transparent_aurora_faded_green">#0D64705A</color>
     <color name="transparent_darker_purple">#0D530077</color>
-    <color name="aurora_green">#FF64705A</color>
+    <color name="aurora_faded_green">#FF64705A</color>
+    <color name="aurora_green">#FFA9E58B</color>
+    <color name="aurora_yellow">#FFD5C609</color>
+    <color name="aurora_red">#FFB2051C</color>
 </resources>

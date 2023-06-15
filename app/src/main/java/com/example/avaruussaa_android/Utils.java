@@ -12,17 +12,19 @@ import java.util.regex.Pattern;
 
 // Class for small utility functions.
 public class Utils {
+    // Splits a string at <delimiter> and returns the segments in an array.
     public static String[] splitString(@NonNull String string, @NonNull String delimiter) {
         return Pattern.compile(Pattern.quote(delimiter)).split(string);
     }
 
-    // Use this to format user input numerals. Removes leading and trailing zeroes.
-    public static String removeExtraZeroes(@NonNull String string) {
+    // Removes leading and trailing zeroes and useless decimal points from a string.
+    // TODO: This may break when translations are enabled, rewrite?
+    public static String trimZeroes(@NonNull String string) {
         if (string.equals(".")) {
             return "0";
         }
 
-        // First regex from https://stackoverflow.com/questions/14984664/remove-trailing-zero-in-java
+        // First regex from Kent @ https://stackoverflow.com/questions/14984664/remove-trailing-zero-in-java
         string = string.contains(".") ? string.replaceAll("0*$","").replaceAll("\\.$","") : string;
         string = string.length() > 1 ? string.replaceFirst("^0+", "") : string;
 
@@ -33,6 +35,24 @@ public class Utils {
         return string.length() > 1 || (string.length() > 0 && string.charAt(0) != '0') ? string : "0";
     }
 
+    // Cuts off strings that are longer than <length> characters.
+    public static String truncateString(@NonNull String string, int length) {
+        if (string.length() > length) {
+           return string.substring(0,length);
+        }
+
+        return string;
+    }
+
+    // Formats a string representing a decimal numeral by applying the trim and truncate functions to it.
+    public static String formatNumberString(@NonNull String string, int length) {
+        String formattedString = trimZeroes(string);
+        formattedString = truncateString(formattedString, length);
+        // Trim again to fix edge cases like "123.04" being truncated to "123.0".
+        return trimZeroes(formattedString);
+    }
+
+    // Writes a string to a file.
     public static synchronized void writeToFile(@NonNull Context context, @NonNull String filename, String content) throws IOException {
         File file = new File(context.getFilesDir(), filename);
 
