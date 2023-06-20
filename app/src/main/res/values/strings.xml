@@ -13,6 +13,7 @@
     <string name="main_probability_text_quiet">All quiet</string>
     <string name="main_probability_text_low">Low probability</string>
     <string name="main_probability_text_high">High probability</string>
+    <string name="main_timer_text">Next update in: %1$s</string>
 
     <!-- Settings activity -->
     <string name="title_activity_settings">Settings</string>
@@ -22,7 +23,7 @@
     <string name="settings_notifications_summary_off">Notifications disabled</string>
     <string name="settings_notifications_summary_no_permission">Notifications disabled, grant permission to enable</string>
     <string name="settings_notifications_summary_on">Notifications enabled</string>
-    <string name="settings_brightness_title">Mood</string>
+    <string name="settings_brightness_title">Main screen mood</string>
     <string name="settings_toast_permission">Please grant Notification permission to enable notifications.</string>
     <string name="settings_btn_back_content_description">Back to previous screen</string>
 

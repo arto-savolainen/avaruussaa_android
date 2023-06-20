@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SeekBarPreference;
 import androidx.preference.SwitchPreferenceCompat;
 
 // Android Preferences automatically implement the logic of saving settings changes to SharedPreferences.
@@ -133,6 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
             EditTextPreference thresholdPreference = findPreference("threshold");
             EditTextPreference intervalPreference = findPreference("interval");
             SwitchPreferenceCompat notificationSwitch = findPreference("notifications");
+            SeekBarPreference brightnessBar = findPreference("brightness");
             Boolean notificationEnabled = new AppSettings().getNotificationsEnabled();
 
             // Set notification threshold and interval preferences to only accept decimal numerals for user input.
@@ -153,6 +155,19 @@ public class SettingsActivity extends AppCompatActivity {
                 checkPermission(notificationSwitch);
                 setNotificationSwitchListener(notificationSwitch);
             }
+
+            if (brightnessBar != null) {
+                setBrightnessBarListener(brightnessBar);
+            }
+        }
+
+        private void setBrightnessBarListener(SeekBarPreference brightnessBar) {
+//            brightnessBar.setOnPreferenceChangeListener((preference, newValue) -> {
+////                View settingsView = getActivity().findViewById(android.R.id.content).getRootView();
+//                View settingsView = getActivity().findViewById(android.R.id.content);
+//
+//                return true;
+//            });
         }
     }
 }

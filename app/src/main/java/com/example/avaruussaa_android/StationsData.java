@@ -32,7 +32,7 @@ public class StationsData {
     public static void setCurrentStation(@NonNull Context context, String stationName) {
         Log.d(TAG, "IN SETCURRENTSTATION, parameter stationName: " + stationName);
         currentStationName = stationName;
-        StationsData.writeStringToPreferences(context, "current_station_name", stationName);
+        StationsData.writeStringToStationStore(context, "current_station_name", stationName);
     }
 
     // Find station data of name from the list, if data is not set yet gets it from SharedPreferences
@@ -47,7 +47,7 @@ public class StationsData {
         }
 
         Log.d(TAG, "findStation: CACHE MISS, returning sharedprefs");
-        return getStationFromSharedPreferences(context, stationName);
+        return getStationFromStationStore(context, stationName);
     }
 
     public static Boolean isInitialized() {
@@ -63,7 +63,7 @@ public class StationsData {
 
         // Create a deep copy of the list so we don't reference data created by UpdateWorker. Data is now cached.
         stationsList = copyStationsList(stationsData);
-        writeStationsToPreferences(context, stationsList);
+        writeStationsToStationStore(context, stationsList);
 
         initialized = true;
 
@@ -81,7 +81,7 @@ public class StationsData {
     }
 
     // Takes a list of stations, converts it to key-value Pairs and writes them to "StationStore" SharedPreferences.
-    private static void writeStationsToPreferences(@NonNull Context context, @NonNull List<Station> stations) {
+    private static void writeStationsToStationStore(@NonNull Context context, @NonNull List<Station> stations) {
         Log.d(TAG, "writeStationsToPreferences: stations: " + stations);
         List<Pair<String, String>> stationPrefList = new ArrayList<>();
 
@@ -91,12 +91,12 @@ public class StationsData {
             stationPrefList.add(new Pair<>(station.name() + "_error", station.error()));
         }
 
-        writeListToPreferences(context, stationPrefList);
+        writeListToStationStore(context, stationPrefList);
     }
 
     // General use function for writing a List of key-value Pairs to StationStore SharedPreferences
     @SuppressLint("ApplySharedPref")
-    public static void writeListToPreferences(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
+    public static void writeListToStationStore(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
         Log.d(TAG, "writeListToPreferences prefs: " + prefs);
         SharedPreferences stationStore = context.getSharedPreferences("StationStore",  Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = stationStore.edit();
@@ -138,13 +138,30 @@ public class StationsData {
     }
 
     @SuppressLint("ApplySharedPref")
-    public static void writeStringToPreferences(@NonNull Context context, @NonNull String key, @NonNull String value) {
+    public static void writeStringToStationStore(@NonNull Context context, @NonNull String key, @NonNull String value) {
         Log.d(TAG, "Writing String to preferences, key: " + key + ", value: " + value);
         SharedPreferences stationStore = context.getSharedPreferences("StationStore", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = stationStore.edit();
         editor.putString(key, value);
         editor.commit();
 //        editor.apply();
+    }
+
+    // This is used by UpdateWorker to save the Unix timestamp of the time of the last notification.
+    @SuppressLint("ApplySharedPref")
+    public static void writeLongToStationStore(@NonNull Context context, @NonNull String key, long value) {
+        Log.d(TAG, "Writing long to preferences, key: " + key + ", value: " + value);
+        SharedPreferences stationStore = context.getSharedPreferences("StationStore", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = stationStore.edit();
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
+    // This is used by UpdateWorker to get the Unix timestamp of the time of the last notification.
+    public static long getLongFromStationStore(@NonNull Context context, @NonNull String key, long defaultValue) {
+        Log.d(TAG, "Retrieving Long from preferences, key: " + key);
+        SharedPreferences stationStore = context.getSharedPreferences("StationStore", Context.MODE_PRIVATE);
+        return stationStore.getLong(key, defaultValue);
     }
 
     public static String getCurrentStationName(@NonNull Context context) {
@@ -177,7 +194,7 @@ public class StationsData {
             return findStationData(context, stationName);
         }
 
-        return getStationFromSharedPreferences(context, stationName);
+        return getStationFromStationStore(context, stationName);
     }
 
     public static Station getCurrentStation(@NonNull Context context) {
@@ -189,10 +206,10 @@ public class StationsData {
 
         // This shouldn't be reached given how the program is currently structured.
         // In practice getCurrentStation() is never called before the cache is initialized.
-        return getStationFromSharedPreferences(context, currentStationName);
+        return getStationFromStationStore(context, currentStationName);
     }
 
-    private static Station getStationFromSharedPreferences(@NonNull Context context, @NonNull String stationName) {
+    private static Station getStationFromStationStore(@NonNull Context context, @NonNull String stationName) {
         // By finding the station's code we can form a valid Station even if it's not found in StationStore.
         // This shouldn't be required I think, but it's here for safety.
         String stationCode = findStationCode(context, stationName);

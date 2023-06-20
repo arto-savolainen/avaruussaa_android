@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         final MainModel viewModel = new ViewModelProvider(this).get(MainModel.class);
         TextView activityView = findViewById(R.id.main_tv_activity_value);
         TextView probabilityView = findViewById(R.id.main_tv_probability);
+        TextView timerView = findViewById(R.id.main_tv_timer);
         ImageButton settingsBtn = findViewById(R.id.main_btn_settings);
         Button stationBtn = findViewById(R.id.main_btn_station);
         ImageView backgroundImg = findViewById(R.id.main_iv_background);
@@ -47,11 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
             Log.d(TAG, "onCreate: SHOULD SHOW REQUEST PERMISSION RATIONALE! WHATEVER LOL");
-            // If this method returns true, show an educational UI to the user. In this UI, describe why the feature that the user wants to enable needs a particular permission.
+            // "If this method returns true, show an educational UI to the user. In this UI, describe why the feature that the user wants to enable needs a particular permission."
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 activityView.setText(newActivity);
 
                 // If the text is not the "loading" message or an error message, set its style to activity_big.
-                if (!newActivity.contains(getResources().getString(R.string.main_loading_text))) {
+                if (!newActivity.contains(getString(R.string.main_loading_text))) {
                     activityView.setTextAppearance(R.style.activity_big);
 
                     // Color text according to the strength of magnetic activity.
@@ -79,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         if (activityDouble < 0.3) {
                             probabilityView.setText(R.string.main_probability_text_quiet);
                             probabilityView.setTextAppearance(R.style.probability_quiet);
+                            activityView.setTextColor(getColor(R.color.activity_blue));
                         } else if (activityDouble >= 0.3 && activityDouble < 0.5) {
                             probabilityView.setText(R.string.main_probability_text_low);
                             probabilityView.setTextAppearance(R.style.probability_low);
@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Changes the opacity of the view's background image according to the "brightness" preference.
         viewModel.getBrightness().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer newBrightness) {
@@ -116,7 +117,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Navigate to SettingsActivity when user presses the settings button
+        // Observes LiveData in the view model to update the "Next update in mm:ss" textView every second.
+        viewModel.getTimerString().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String newTimerString) {
+                timerView.setText(getString(R.string.main_timer_text, newTimerString));
+            }
+        });
+
+        // Navigate to SettingsActivity when user presses the settings button.
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Navigate to StationsActivity when user presses the station button
+        // Navigate to StationsActivity when user presses the station button.
         stationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

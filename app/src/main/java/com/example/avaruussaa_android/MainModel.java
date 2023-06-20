@@ -3,6 +3,7 @@ package com.example.avaruussaa_android;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.CountDownTimer;
 import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -11,21 +12,25 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.preference.PreferenceManager;
 
-// ViewModel for handling data and user actions for MainActivity
-public class MainModel extends AndroidViewModel {
+// ViewModel for MainActivity. Listens for changes in SharedPreferences and updates MutableLiveData member
+// variables accordingly. These changes in MutableLiveData are observed by MainActivity to update the view.
+public class MainModel extends AndroidViewModel implements TimerSubscriber {
     private static final String TAG = "mainmodeltag";
     private final SavedStateHandle savedStateHandle;
     private MutableLiveData<String> nameLiveData;
     private MutableLiveData<String> activityLiveData;
     private MutableLiveData<String> errorLiveData;
     private MutableLiveData<Integer> brightnessLiveData;
+    private MutableLiveData<String> timerLiveData;
     private final String NAME_KEY = "NAME";
     private final String ACTIVITY_KEY = "ACTIVITY";
     private final String ERROR_KEY = "ERROR";
     private final String BRIGHTNESS_KEY = "BRIGHTNESS";
-    private int DEFAULT_BRIGHTNESS;
-    SharedPreferences.OnSharedPreferenceChangeListener stationListener = null; // Must store a strong reference to listener to prevent GC.
-    SharedPreferences.OnSharedPreferenceChangeListener brightnessListener = null;
+    private final String TIMER_KEY = "TIMER";
+    private final int DEFAULT_BRIGHTNESS;
+    SharedPreferences.OnSharedPreferenceChangeListener stationListener; // Must store a strong reference to listener to prevent GC.
+    SharedPreferences.OnSharedPreferenceChangeListener brightnessListener;
+    CountDownTimer timer; // Counts down seconds to the next data update.
 
     public MainModel(Application application, SavedStateHandle savedStateHandle) {
         super(application);
@@ -36,21 +41,23 @@ public class MainModel extends AndroidViewModel {
         initializeLiveData();
         registerStationChangeListener();
         registerBrightnessChangeListener();
-//        synchronizeTimer(); // TODO: synchronizeTimer runs / returns / something a timer that has its time remaining retrieved from WorkController. This timer executes code updating the timer string in a MutableLiveData every second.
+        synchronizeTimer();
     }
 
     // Initializes MutableLiveData from SavedState, or if SavedState is empty retrieves state from StationsData.
     private void initializeLiveData() {
+        Context context = getApplication().getApplicationContext();
+
         nameLiveData = savedStateHandle.getLiveData(NAME_KEY, "");
         activityLiveData = savedStateHandle.getLiveData(ACTIVITY_KEY, "");
         errorLiveData = savedStateHandle.getLiveData(ERROR_KEY, "");
         brightnessLiveData = savedStateHandle.getLiveData(BRIGHTNESS_KEY, DEFAULT_BRIGHTNESS);
-
+        timerLiveData = new MutableLiveData<>("00:00");
 
         Log.d(TAG, "LIVEDATA VALUES FROM SAVEDSTATE: name: " + nameLiveData.getValue() + ", activity: " + activityLiveData.getValue() + ", error: " + errorLiveData.getValue() );
 
-        Context context = getApplication().getApplicationContext();
-
+        // Here we initialize MutableLiveData in case the activity is reset and SavedState is lost. Currently this
+        // should not happen, but could occur if e.g. the notification intent which launches MainActivity is changed.
         if (errorLiveData.getValue() != null && errorLiveData.getValue().length() == 0) {
             errorLiveData.setValue((StationsData.getCurrentStation(context).error()));
         }
@@ -125,6 +132,10 @@ public class MainModel extends AndroidViewModel {
         }
     }
 
+    private void synchronizeTimer() {
+        WorkController.subscribe(this);
+    }
+
     private void updateLiveDataAndSavedState(Station currentStation) {
         try {
             Log.d(TAG, "updateLiveDataAndSavedStateHandle: updating LiveData and savedStateHandle. currentStation:" + currentStation);
@@ -140,8 +151,23 @@ public class MainModel extends AndroidViewModel {
         }
     }
 
+    // This function is called by WorkController every second as the timer it's running updates.
+    // It then builds a string from the given milliseconds in the format "mm:ss" and sets the MutableLiveData value to update UI.
+    @Override
+    public void onTick(long millisUntilFinished) {
+        int secondsUntilFinished = (int) millisUntilFinished / 1000;
+        int minutes = Math.floorDiv(secondsUntilFinished, 60);
+        int seconds = secondsUntilFinished - minutes * 60;
+        String minuteString = minutes < 10 ? "0" + minutes :  "" + minutes;
+        String secondsString = seconds < 10 ?  "0" + seconds :  "" + seconds;
+
+        // WorkController exists in the main thread so this should be safe.
+        timerLiveData.setValue(minuteString + ":" + secondsString);
+    }
+
     @Override
     public void onCleared() {
+        WorkController.unsubscribe();
     }
 
     LiveData<String> getName() {
@@ -158,5 +184,9 @@ public class MainModel extends AndroidViewModel {
 
     LiveData<Integer> getBrightness() {
         return brightnessLiveData;
+    }
+
+    LiveData<String> getTimerString() {
+        return timerLiveData;
     }
 }

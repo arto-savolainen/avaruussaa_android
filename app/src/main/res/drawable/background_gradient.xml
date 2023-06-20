@@ -5,7 +5,5 @@
         android:centerColor="@color/transparent_aurora_faded_green"
         android:endColor="@color/transparent_dark_purple"
         android:angle="90"
-        android:type="linear"
-        />
-
+        android:type="linear" />
 </shape>

@@ -5,7 +5,8 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-// Application.onCreate() is the first thing that runs when the app is started, initialize processes here.
+// This class begins the data fetching process by calling WorkController.startWork().
+// Also offers a way for other classes to get application context through getInstance().
 public class InitApp extends Application {
     private static final String TAG = "inittag";
     private static InitApp instance;
@@ -27,7 +28,7 @@ public class InitApp extends Application {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
         // Start periodic work i.e. data fetching at intervals.
-        WorkController.initWork(getApplicationContext());
+        WorkController.startWork();
     }
 
     // For emulation use only, will never be called on a production android device.
