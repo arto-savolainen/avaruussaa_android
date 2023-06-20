@@ -18,8 +18,9 @@ public class Utils {
     }
 
     // Removes leading and trailing zeroes and useless decimal points from a string.
-    // TODO: This may break when translations are enabled, rewrite?
     public static String trimZeroes(@NonNull String string) {
+        string = string.replace(',', '.');
+
         if (string.equals(".")) {
             return "0";
         }

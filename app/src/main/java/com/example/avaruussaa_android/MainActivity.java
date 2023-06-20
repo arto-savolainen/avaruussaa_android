@@ -79,11 +79,11 @@ public class MainActivity extends AppCompatActivity {
                             probabilityView.setText(R.string.main_probability_text_quiet);
                             probabilityView.setTextAppearance(R.style.probability_quiet);
                             activityView.setTextColor(getColor(R.color.activity_blue));
-                        } else if (activityDouble >= 0.3 && activityDouble < 0.5) {
+                        } else if (activityDouble >= 0.3 && activityDouble < 0.4) {
                             probabilityView.setText(R.string.main_probability_text_low);
                             probabilityView.setTextAppearance(R.style.probability_low);
                             activityView.setTextColor(getColor(R.color.aurora_yellow));
-                        } else if (activityDouble >= 0.5) {
+                        } else if (activityDouble >= 0.4) {
                             probabilityView.setText(R.string.main_probability_text_high);
                             probabilityView.setTextAppearance(R.style.probability_high);
                             activityView.setTextColor(getColor(R.color.aurora_red));

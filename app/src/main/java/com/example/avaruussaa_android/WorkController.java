@@ -17,7 +17,7 @@ public class WorkController {
     private static final String TAG = "workcontrollertag";
     private static final long TEN_MINUTES_IN_MILLIS = 10 * 60 * 1000;
     private static final long TIMER_TICK_INTERVAL_MILLIS = 1000;
-    private static int PERIODIC_WORK_INTERVAL_MINUTES = 20;
+    private static final int PERIODIC_WORK_INTERVAL_MINUTES = 20;
     private static CountDownTimer repeatingWorkEnqueuingTimer;
     private static TimerSubscriber subscriber;
 

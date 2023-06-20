@@ -1,0 +1,3 @@
+Avaruussää app displays magnetic activity above Finland, as measured by the weather stations of the Finnish Meteorological Institute. The user can choose to be notified in the event the data indicates a high probability of northern lights. The user can select to display data from different monitoring stations and adjust the notification threshold, and other settings.
+
+To run the app: clone the repository, open the folder in Android Studio and Run it on an emulated device. Proper release coming later.
