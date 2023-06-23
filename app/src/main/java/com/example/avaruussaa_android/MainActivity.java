@@ -32,10 +32,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG, "onCreate: MAINACTIVITY onCreate");
+
+        // Register the view model for observing LiveData and add it as a Lifecycle observer.
+        final MainModel viewModel = new ViewModelProvider(this).get(MainModel.class);
+        getLifecycle().addObserver(viewModel);
         // Register Notifier to receive events for MainActivity lifecycle changes to determine when to send notifications.
         getLifecycle().addObserver(new Notifier());
 
-        final MainModel viewModel = new ViewModelProvider(this).get(MainModel.class);
         TextView activityView = findViewById(R.id.main_tv_activity_value);
         TextView probabilityView = findViewById(R.id.main_tv_probability);
         TextView timerView = findViewById(R.id.main_tv_timer);
@@ -90,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } catch (NumberFormatException e) {
                         Log.e(TAG, "Parsing newActivity to double failed! EXCEPTION: " + e);
-                        e.printStackTrace();
                     }
                 }
             }
@@ -104,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
                 if (newError.length() > 0) {
                     activityView.setText(newError);
                     activityView.setTextAppearance(R.style.error_grey);
+                    probabilityView.setText(R.string.main_probability_text_quiet);
+                    probabilityView.setTextAppearance(R.style.probability_quiet);
                 }
             }
         });

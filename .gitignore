@@ -33,3 +33,5 @@ google-services.json
 *.hprof
 
 assets/
+logcat.txt
+TODO.txt

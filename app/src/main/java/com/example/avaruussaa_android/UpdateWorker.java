@@ -32,6 +32,13 @@ public class UpdateWorker extends Worker {
         Context context = getApplicationContext();
         ArrayList<Station> stationsData = new ArrayList<>();
 
+        // If data fetching failed, return Result.retry() so that WorkManager will reschedule the worker.
+        if (responseBody.length() == 0) {
+            setStationsConnectivityError(stationsData);
+            Log.d(TAG, "UpdateWorker doWork: DATA FETCH FAILED, retrying...");
+            return Result.retry();
+        }
+
         // Find station data from the HTML string and update the activity for each station.
         for (Station station : StationsData.getDefaultStationsList(context)) {
             // Station codes are used to find data within the javascript contained in response.body().
@@ -88,6 +95,18 @@ public class UpdateWorker extends Worker {
         return Result.success();
     }
 
+    // This function builds a list of stations with the error set to indicate a connectivity problem
+    // and sends that list to StationsData, resulting in the error being displayed in the main view.
+    private void setStationsConnectivityError(ArrayList<Station> stationsData) {
+        Context context = getApplicationContext();
+
+        for (Station station : StationsData.getDefaultStationsList(context)) {
+            stationsData.add(createStation(station, "", context.getString(R.string.error_connectivity)));
+        }
+
+        StationsData.setStationsData(context, stationsData);
+    }
+
     // Calls Notifier.sendNotification() if conditions regarding the currently selected station's magnetic activity are met.
     // 1) Activity must meet or exceed the threshold set in app settings.
     // 2) Time since the last notification must be less than the notification interval set in app settings.
@@ -109,19 +128,17 @@ public class UpdateWorker extends Worker {
 
         try {
             currentActivity = Double.parseDouble(currentStation.activity());
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             Log.e(TAG, "doWork: EXCEPTION: Parsing current station activity to double failed, e: " + e);
-            e.printStackTrace();
         }
 
         if (currentActivity >= notificationThreshold && !silentUpdate) {
             Boolean notificationSent = Notifier.sendNotification(currentStation.name(), currentStation.activity());
+
             if (notificationSent) {
                 writeLastNotificationTimeToPreferences();
             }
-        }
-        else if (currentActivity >= notificationThreshold && silentUpdate) {
+        } else if (currentActivity >= notificationThreshold && silentUpdate) {
             Notifier.updateNotification(currentStation.name(), currentStation.activity());
         }
     }
@@ -129,8 +146,6 @@ public class UpdateWorker extends Worker {
     // Gets the datetime of the last notification from SharedPreferences and compares it to current time.
     // Returns true if <interval> time has not yet elapsed since the last notification, false if it has.
     protected Boolean withinInterval() {
-        Log.d(TAG, "withinInterval: WITHININTERVAL BEGINNING");
-        //TODO: Implement interval check: Write datetime to prefs, check if datetime.now() - lastdatetime > interval -> sendNotification()
         long defaultValue = 0;
         long lastNotificationTime = StationsData.getLongFromStationStore(getApplicationContext(), "last_notification_time", defaultValue);
 
@@ -141,17 +156,17 @@ public class UpdateWorker extends Worker {
         }
 
         AppSettings settings = new AppSettings();
-        long intervalMs = (long) settings.getNotificationInterval() * 60 * 60 * 1000; // Interval in milliseconds.
-        long currentTimeMs = new Date().getTime(); // Current Unix time in milliseconds.
+        long intervalMillis = (long) (settings.getNotificationInterval() * 60 * 60 * 1000); // Interval in milliseconds.
+        long currentTimeMillis = new Date().getTime(); // Current Unix time in milliseconds.
 
-        Log.d(TAG, "withinInterval: " + currentTimeMs + " - " + lastNotificationTime + " < " + intervalMs + " == " + (currentTimeMs - lastNotificationTime < intervalMs));
+        Log.d(TAG, "withinInterval: " + currentTimeMillis + " - " + lastNotificationTime + " < " + intervalMillis + " == " + (currentTimeMillis - lastNotificationTime < intervalMillis));
         // If there has not yet elapsed <interval> milliseconds since the last notification, return true.
-        return currentTimeMs - lastNotificationTime < intervalMs;
+        return currentTimeMillis - lastNotificationTime < intervalMillis;
     }
 
     protected void writeLastNotificationTimeToPreferences() {
-        long currentTimeMs = new Date().getTime();
-        StationsData.writeLongToStationStore(getApplicationContext(), "last_notification_time", currentTimeMs);
+        long currentTimeMillis = new Date().getTime();
+        StationsData.writeLongToStationStore(getApplicationContext(), "last_notification_time", currentTimeMillis);
     }
 
     protected Station createStation(@NonNull Station station, @NonNull String activity, @NonNull String error) {
@@ -161,23 +176,39 @@ public class UpdateWorker extends Worker {
     // Makes a HTTP request to <URL> to retrieve its content and returns the response body as a string.
     protected String fetchData() {
         String responseBody = "";
+        int retries = 5;
+        int waitSeconds = 1;
 
-        try {
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                .url(URL)
-                .addHeader("Cache-Control", "no-cache")
-                .addHeader("Expires", "0")
-                .build();
+        // Sometimes we get an UnknownHostException, which may be caused by phone battery optimizations.
+        // In case that happens wait 1 second and retry connection until it succeeds or the retry limit is hit.
+        // Probably doesn't help if the OS limits background network traffic but may be useful if it's a server issue.
+        for (int i = 1; i <= retries; i++) {
+            Log.d(TAG, "fetchData: CONNECTION ATTEMPT NUMBER " + i);
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                    .url(URL)
+                    .addHeader("Cache-Control", "no-cache")
+                    .addHeader("Expires", "0")
+                    .build();
 
-            try (Response response = client.newCall(request).execute()) {
-                // If response.body() is null return empty string.
-                responseBody = response.body() != null ? response.body().string() : "";
+                try (Response response = client.newCall(request).execute()) {
+                    // If response.body() is null return empty string.
+                    responseBody = response.body() != null ? response.body().string() : "";
 
-                return responseBody;
+                    return responseBody;
+                }
+            } catch (Exception e) {
+                Log.d(TAG, e.toString());
+
+                try {
+                    // Sleeping in a worker thread should be fine.
+                    Thread.sleep(waitSeconds);
+                }
+                catch (Exception exception) {
+                    Log.d(TAG, "fetchData: EXCEPTION while sleeping, e: " + exception);
+                }
             }
-        } catch (Exception e) {
-            Log.d("errortag", e.toString());
         }
 
         return responseBody; // Return empty string if something went wrong.

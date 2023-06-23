@@ -34,6 +34,7 @@
     <!-- Programmatically set station error messages -->
     <string name="error_station_disabled">Data for %1$s observatory is temporarily disabled.</string>
     <string name="error_station_null">Latest activity data for %1$s observatory not found. Check back soon.</string>
+    <string name="error_connectivity">Connectivity error. Server may be down, or your phone\'s battery optimization may be blocking network requests.</string>
     
     <!-- Notifications-->
     <string name="notification_channel_id">activity_channel</string>

@@ -8,11 +8,14 @@ import androidx.annotation.WorkerThread;
 import androidx.work.WorkerParameters;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-// This class is the same as UpdateWorker, except it only does work if InitApp.getInstance() returns null.
-// That is, if our app has been killed or Application does not exist for some other reason.
+// This class is the same as UpdateWorker except it only fetches data if the cache hasn't been updated in a while.
+// Note: I've found that many phones, depending on the manufacturer, will slow or stop timers when the app is in
+// the background to save battery. Thus periodic workers are the only way to reliably send notifications.
 public class PeriodicUpdateWorker extends UpdateWorker {
     protected static final String TAG = "periodicworkertag";
+    private static final long CACHE_MAX_AGE_MILLIS = 10 * 60 * 1000; // Cache should be no older than 10 minutes.
 
     public PeriodicUpdateWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
@@ -22,16 +25,19 @@ public class PeriodicUpdateWorker extends UpdateWorker {
     @WorkerThread
     @Override
     public Result doWork() {
+        Log.d(TAG, "!!!!! PERIODIC !!!!! WORKER ENTERED doWork()");
         Context context = getApplicationContext();
-        Log.d(TAG, "!!!!! PERIODIC !!!!! WORKER ENTERED doWork(). context: " + context);
+        long lastUpdateTimeMillis = StationsData.getLongFromStationStore(context, "last_update_time", 0);
+        long currentTimeMillis = new Date().getTime();
 
-        // Only do work with the periodic worker if the app has been killed or not yet started after device reboot.
-        // Otherwise data fetching is done by UpdateWorker which is scheduled to run every 10 minutes by WorkController.
-        if (InitApp.getInstance() != null) {
+        Log.d(TAG, "doWork: currentTime " + currentTimeMillis + " - lastUpdateTime " + lastUpdateTimeMillis + " < cacheMaxAge " + CACHE_MAX_AGE_MILLIS + " == " + (currentTimeMillis - lastUpdateTimeMillis < CACHE_MAX_AGE_MILLIS));
+
+        // If data was updated less than cacheMaxAge ago, no need to fetch it from the web. We notify using cached data and finish the Worker.
+        if (currentTimeMillis - lastUpdateTimeMillis < CACHE_MAX_AGE_MILLIS) {
+            checkConditionsAndNotify();
             return Result.success();
         }
 
-        Log.d(TAG, "--------------------- PERIODIC WORKER DOING WORK ---------------------");
         String responseBody = fetchData();
         ArrayList<Station> stationsData = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package com.example.avaruussaa_android;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +13,8 @@ import java.util.regex.Pattern;
 
 // Class for small utility functions.
 public class Utils {
+    private static final String TAG = "utilstag";
+
     // Splits a string at <delimiter> and returns the segments in an array.
     public static String[] splitString(@NonNull String string, @NonNull String delimiter) {
         return Pattern.compile(Pattern.quote(delimiter)).split(string);
@@ -54,12 +57,18 @@ public class Utils {
     }
 
     // Writes a string to a file.
-    public static synchronized void writeToFile(@NonNull Context context, @NonNull String filename, String content) throws IOException {
-        File file = new File(context.getFilesDir(), filename);
+    public static synchronized void writeToFile(@NonNull Context context, @NonNull String filename, String content) {
+        Log.d(TAG, "writeToFile: writing to file " + filename);
+        try {
+            File file = new File(context.getFilesDir(), filename);
 
-        try (FileOutputStream outputStream = new FileOutputStream(file);
-             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream)) {
-            outputStreamWriter.write(content);
+            try (FileOutputStream outputStream = new FileOutputStream(file);
+                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream)) {
+                outputStreamWriter.write(content);
+            }
+        }
+        catch (IOException e) {
+            Log.d(TAG, "writeToFile: EXCEPTION: " + e);
         }
     }
 }

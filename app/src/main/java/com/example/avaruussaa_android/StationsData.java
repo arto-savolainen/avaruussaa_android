@@ -10,6 +10,7 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 // This is our data store which holds information about the magnetic activity and error state of each station.
@@ -32,7 +33,7 @@ public class StationsData {
     public static void setCurrentStation(@NonNull Context context, String stationName) {
         Log.d(TAG, "IN SETCURRENTSTATION, parameter stationName: " + stationName);
         currentStationName = stationName;
-        StationsData.writeStringToStationStore(context, "current_station_name", stationName);
+        writeStringToStationStore(context, "current_station_name", stationName);
     }
 
     // Find station data of name from the list, if data is not set yet gets it from SharedPreferences
@@ -65,14 +66,23 @@ public class StationsData {
         stationsList = copyStationsList(stationsData);
         writeStationsToStationStore(context, stationsList);
 
+        // Write the time of the update to SharedPrefs so that cache age can be determined (used by PeriodicUpdateWorker).
+        writeLastUpdateTimeToStationStore(context);
+
         initialized = true;
 
         // This writes to SharedPreferences and fires the listener function in MainModel which updates the main view.
-        StationsData.notifyUpdateComplete(context);
+        notifyUpdateComplete(context);
+    }
+
+    private static void writeLastUpdateTimeToStationStore(@NonNull Context context) {
+        long currentTimeMillis = new Date().getTime();
+        writeLongToStationStore(context, "last_update_time", currentTimeMillis);
     }
 
     private static ArrayList<Station> copyStationsList(List<Station> stationsData) {
         ArrayList<Station> newList = new ArrayList<>();
+
         for (Station station : stationsData) {
             newList.add(station.clone());
         }
@@ -94,7 +104,7 @@ public class StationsData {
         writeListToStationStore(context, stationPrefList);
     }
 
-    // General use function for writing a List of key-value Pairs to StationStore SharedPreferences
+    // General use function for writing a List of key-value Pairs to StationStore SharedPreferences.
     @SuppressLint("ApplySharedPref")
     public static void writeListToStationStore(@NonNull Context context, @NonNull List<Pair<String, String>> prefs) {
         Log.d(TAG, "writeListToPreferences prefs: " + prefs);

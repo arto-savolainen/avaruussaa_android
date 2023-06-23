@@ -6,7 +6,10 @@ import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
@@ -14,7 +17,7 @@ import androidx.preference.PreferenceManager;
 
 // ViewModel for MainActivity. Listens for changes in SharedPreferences and updates MutableLiveData member
 // variables accordingly. These changes in MutableLiveData are observed by MainActivity to update the view.
-public class MainModel extends AndroidViewModel implements TimerSubscriber {
+public class MainModel extends AndroidViewModel implements TimerSubscriber, DefaultLifecycleObserver {
     private static final String TAG = "mainmodeltag";
     private final SavedStateHandle savedStateHandle;
     private MutableLiveData<String> nameLiveData;
@@ -56,8 +59,8 @@ public class MainModel extends AndroidViewModel implements TimerSubscriber {
 
         Log.d(TAG, "LIVEDATA VALUES FROM SAVEDSTATE: name: " + nameLiveData.getValue() + ", activity: " + activityLiveData.getValue() + ", error: " + errorLiveData.getValue() );
 
-        // Here we initialize MutableLiveData in case the activity is reset and SavedState is lost. Currently this
-        // should not happen, but could occur if e.g. the notification intent which launches MainActivity is changed.
+        // Here we initialize MutableLiveData in case the task stack disappears and SavedState is lost. Currently this
+        // should not happen, but could occur if for, example, the notification intent which launches MainActivity is changed.
         if (errorLiveData.getValue() != null && errorLiveData.getValue().length() == 0) {
             errorLiveData.setValue((StationsData.getCurrentStation(context).error()));
         }
@@ -152,7 +155,7 @@ public class MainModel extends AndroidViewModel implements TimerSubscriber {
     }
 
     // This function is called by WorkController every second as the timer it's running updates.
-    // It then builds a string from the given milliseconds in the format "mm:ss" and sets the MutableLiveData value to update UI.
+    // It builds a string from the given milliseconds in the format "mm:ss" and sets the MutableLiveData's value to update UI.
     @Override
     public void onTick(long millisUntilFinished) {
         int secondsUntilFinished = (int) millisUntilFinished / 1000;
@@ -163,6 +166,16 @@ public class MainModel extends AndroidViewModel implements TimerSubscriber {
 
         // WorkController exists in the main thread so this should be safe.
         timerLiveData.setValue(minuteString + ":" + secondsString);
+    }
+
+    // Battery optimization may block background network requests, resulting in an error message.
+    // To attempt to fix this we detect the error and trigger a data update when the user resumes using the app.
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
+        if (errorLiveData != null && errorLiveData.getValue() != null && errorLiveData.getValue().contains(getApplication().getString(R.string.error_connectivity))) {
+            Log.d(TAG, "onResume: !!!!! Error detected, triggering manual update !!!!!");
+            WorkController.triggerUpdate();
+        }
     }
 
     @Override

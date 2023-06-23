@@ -26,25 +26,21 @@ public class Notifier implements DefaultLifecycleObserver {
 
     @Override
     public void onResume(@NonNull LifecycleOwner owner) {
-        Log.d(TAG, "onResume: LIFECYCLE ONRESUME, notifications disabled because app is in the foreground. owner: " + owner);
         inForeground = true;
     }
 
     @Override
     public void onStart(@NonNull LifecycleOwner owner) {
-        Log.d(TAG, "onResume: LIFECYCLE ONSTART, notifications disabled because app is in the foreground. owner: " + owner);
         inForeground = true;
     }
 
     @Override
     public void onPause(@NonNull LifecycleOwner owner) {
-        Log.d(TAG, "onResume: LIFECYCLE ONPAUSE, notifications enabled because app is in the background. owner: " + owner);
         inForeground = false;
     }
 
     @Override
     public void onStop(@NonNull LifecycleOwner owner) {
-        Log.d(TAG, "onResume: LIFECYCLE ONSTOP, notifications enabled because app is in the background. owner: " + owner);
         inForeground = false;
     }
 
