@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stations_title"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/dark_purple"
         android:fontFamily="monospace"
         android:layout_gravity="center_horizontal" />

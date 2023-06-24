@@ -14,9 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 // This is our data store which holds information about the magnetic activity and error state of each station.
-// The data it holds is updated by UpdateWorker. If the data is garbage collected it will be retrieved from SharedPreferences.
-// TODO: MAYBE STATIONSDATA EXTENDS APPLICATION? Is that a good idea? I don't know
-// TODO: Clean up this file
+// The data it holds is updated by UpdateWorker. If the data is gc'd / process is killed it will be retrieved from SharedPreferences.
 public class StationsData {
     // stationsList caches data that is written to SharedPreferences. Cache is always written first so should be up-to-date.
     private static ArrayList<Station> stationsList = null;
@@ -116,7 +114,6 @@ public class StationsData {
         }
 
         editor.commit();
-//        editor.apply(); // Could test if apply / commit makes any difference in app responsiveness.
     }
 
     // Returns a list of station names and codes. Activity and error fields are empty.
@@ -154,7 +151,6 @@ public class StationsData {
         SharedPreferences.Editor editor = stationStore.edit();
         editor.putString(key, value);
         editor.commit();
-//        editor.apply();
     }
 
     // This is used by UpdateWorker to save the Unix timestamp of the time of the last notification.
