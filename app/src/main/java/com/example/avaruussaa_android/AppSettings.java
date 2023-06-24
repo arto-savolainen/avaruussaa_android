@@ -38,7 +38,7 @@ public class AppSettings {
         return doubleValue;
     }
 
-    public Boolean getNotificationsEnabled() {
+    public Boolean areNotificationsEnabled() {
         return prefs.getBoolean("notifications", InitApp.getInstance().getResources().getBoolean(R.bool.default_notifications_enabled));
     }
 }

@@ -3,11 +3,11 @@ package com.example.avaruussaa_android;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -47,18 +47,12 @@ public class MainActivity extends AppCompatActivity {
         Button stationBtn = findViewById(R.id.main_btn_station);
         ImageView backgroundImg = findViewById(R.id.main_iv_background);
 
-        if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-            Log.d(TAG, "onCreate: CAN USE NOTIFICATIONS! WOOT!");
-
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-            Log.d(TAG, "onCreate: SHOULD SHOW REQUEST PERMISSION RATIONALE! WHATEVER LOL");
-            // "If this method returns true, show an educational UI to the user. In this UI, describe why the feature that the user wants to enable needs a particular permission."
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-        } else {
+        // From Android 13 and up we need to ask for permission to send notifications.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
 
-        // Create the observer which updates main_btn_station Button when the current station changes.
+        // Create the observer which updates the station button text when the current station changes.
         viewModel.getName().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newName) {
@@ -66,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Create the observer which updates main_tv_activity_value TextView when the activity for current station changes.
+        // Create the observer which updates main_tv_activity_value when the activity for current station changes.
         viewModel.getActivity().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newActivity) {
@@ -99,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Create the observer which updates main_tv_activity_value TextView with an error msg if necessary.
+        // Create the observer which updates main_tv_activity_value with an error msg if necessary.
         viewModel.getError().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newError) {
@@ -122,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Observes LiveData in the view model to update the "Next update in mm:ss" textView every second.
+        // Observes LiveData in the view model to update the "Next update in mm:ss" text every second.
         viewModel.getTimerString().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String newTimerString) {

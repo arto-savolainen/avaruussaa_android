@@ -29,7 +29,7 @@
         android:shadowRadius="8"
         android:text="@string/main_activity_title"
         android:textColor="@color/dark_purple"
-        android:textSize="55sp"
+        android:textSize="53sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -26,6 +26,13 @@ public class PeriodicUpdateWorker extends UpdateWorker {
     @Override
     public Result doWork() {
         Log.d(TAG, "!!!!! PERIODIC !!!!! WORKER ENTERED doWork()");
+        // The purpose of this Worker is to trigger notifications, so exit immediately if notifications are disabled.
+        AppSettings settings = new AppSettings();
+        boolean notificationsEnabled = settings.areNotificationsEnabled();
+        if (!notificationsEnabled) {
+            return Result.success();
+        }
+
         Context context = getApplicationContext();
         long lastUpdateTimeMillis = StationsData.getLongFromStationStore(context, "last_update_time", 0);
         long currentTimeMillis = new Date().getTime();

@@ -114,7 +114,7 @@ public class UpdateWorker extends Worker {
     // If notifications are disabled in app settings, returns without doing anything.
     protected void checkConditionsAndNotify() {
         AppSettings settings = new AppSettings();
-        Boolean notificationsEnabled = settings.getNotificationsEnabled();
+        Boolean notificationsEnabled = settings.areNotificationsEnabled();
 
         if (!notificationsEnabled) {
             return;
