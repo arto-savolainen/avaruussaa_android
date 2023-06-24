@@ -29,7 +29,6 @@ public class MainModel extends AndroidViewModel implements TimerSubscriber, Defa
     private final String ACTIVITY_KEY = "ACTIVITY";
     private final String ERROR_KEY = "ERROR";
     private final String BRIGHTNESS_KEY = "BRIGHTNESS";
-    private final String TIMER_KEY = "TIMER";
     private final int DEFAULT_BRIGHTNESS;
     SharedPreferences.OnSharedPreferenceChangeListener stationListener; // Must store a strong reference to listener to prevent GC.
     SharedPreferences.OnSharedPreferenceChangeListener brightnessListener;
@@ -161,11 +160,11 @@ public class MainModel extends AndroidViewModel implements TimerSubscriber, Defa
         int secondsUntilFinished = (int) millisUntilFinished / 1000;
         int minutes = Math.floorDiv(secondsUntilFinished, 60);
         int seconds = secondsUntilFinished - minutes * 60;
-        String minuteString = minutes < 10 ? "0" + minutes :  "" + minutes;
+        String minutesString = minutes < 10 ? "0" + minutes :  "" + minutes;
         String secondsString = seconds < 10 ?  "0" + seconds :  "" + seconds;
 
         // WorkController exists in the main thread so this should be safe.
-        timerLiveData.setValue(minuteString + ":" + secondsString);
+        timerLiveData.setValue(minutesString + ":" + secondsString);
     }
 
     // Battery optimization may block background network requests, resulting in an error message.

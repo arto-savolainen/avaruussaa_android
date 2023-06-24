@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Avaruussää</string>
+
+    <!-- The default weather station the data of which will be loaded on first run of the app -->
+    <string name="default_station_name">Nurmijärvi</string>
+
+    <!-- Main activity -->
+    <string name="main_activity_title">AKTIIVISUUS</string>
+    <string name="main_activity_unit">(nT/s)</string>
+    <string name="main_loading_text">ladataan...</string>
+    <string name="main_btn_settings_content_description">Asetusnäkymään</string>
+    <string name="main_iv_background_image_content_description">Taustakuva: revontulet kaupungin valojen yllä</string>
+    <string name="main_probability_text_quiet">Hiljaista</string>
+    <string name="main_probability_text_low">Kohtalainen todennäköisyys</string>
+    <string name="main_probability_text_high">Suuri todennäköisyys</string>
+    <string name="main_timer_text">Seuraava päivitys: %1$s</string>
+
+    <!-- Settings activity -->
+    <string name="title_activity_settings">Asetukset</string>
+    <string name="settings_threshold_title">Ilmoituskynnys (nT/s)</string>
+    <string name="settings_interval_title">Ilmoitusväli (tuntia)</string>
+    <string name="settings_notifications_title">Ilmoitukset</string>
+    <string name="settings_notifications_summary_off">Ilmoitukset pois päältä</string>
+    <string name="settings_notifications_summary_no_permission">Ilmoitukset pois päältä, salli ilmoitukset puhelimen asetuksissa</string>
+    <string name="settings_notifications_summary_on">Ilmoitukset päällä</string>
+    <string name="settings_brightness_title">Etusivun kirkkaus</string>
+    <string name="settings_toast_permission">Saadaksesi ilmoituksia revontulista salli sovelluksen ilmoitukset puhelimen asetuksissa.</string>
+    <string name="settings_btn_back_content_description">Takaisin edelliseen näkymään</string>
+
+    <!-- Stations activity -->
+    <string name="stations_title">Valitse havaintoasema</string>
+    <string name="stations_btn_back_content_description">Takaisin edelliseen näkymään</string>
+
+    <!-- Programmatically set station error messages -->
+    <string name="error_station_disabled">Aseman %1$s havainnot ovat tilapäisesti pois käytöstä.</string>
+    <string name="error_station_null">Aseman %1$s uusin data ei tällä hetkellä ole saatavilla, odota seuraavaa päivitystä.</string>
+    <string name="error_connectivity">Yhteysvirhe. Palvelin saattaa olla tilapäisesti saavuttamaton, tai puhelimesi akunsäästöominaisuus saattaa estää verkkoyhteyden.</string>
+    
+    <!-- Notifications-->
+    <string name="notification_channel_id">activity_channel</string>
+    <string name="notification_channel_name">Revontuli-ilmoitukset</string>
+    <string name="notification_channel_description">Lähettää ilmoituksen kun revontulien todennäköisyys aseman alueella on suuri.</string>
+    <string name="notification_title">Revontulet todennäköisiä</string>
+    <string name="notification_body">"Magneettinen aktiivisuus @ %1$s: %2$s nT/s"</string>
+</resources>

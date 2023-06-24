@@ -22,7 +22,7 @@
         android:key="brightness"
         android:title="@string/settings_brightness_title"
         app:showSeekBarValue="false"
-        app:defaultValue="90"
+        app:defaultValue="@integer/default_brightness"
         android:max="100"
         app:seekBarIncrement="1" />
 
