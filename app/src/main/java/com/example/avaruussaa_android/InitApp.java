@@ -5,8 +5,11 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-// This class begins the data fetching process by calling WorkController.startWork().
-// Also offers a way for other classes to get application context through getInstance().
+import com.example.avaruussaa_android.data.WorkController;
+
+// This is our custom Application class. It begins the data fetching process to retrieve weather station data
+// from the internet by calling WorkController.startWork(). Also offers a static function for other classes
+// to get application context through getInstance().
 public class InitApp extends Application {
     private static final String TAG = "inittag";
     private static InitApp instance;
@@ -27,7 +30,7 @@ public class InitApp extends Application {
         // Always use night theme.
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
-        // Start periodic work i.e. data fetching at intervals.
+        // Start the UpdateWorkers, i.e. data fetching at intervals.
         WorkController.startWork();
     }
 
