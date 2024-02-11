@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="decimal_numeral_max_length">5</integer>
+    <integer name="decimal_numeral_max_length">2</integer>
     <integer name="default_brightness">100</integer>
     <bool name="default_notifications_enabled">true</bool>
 </resources>

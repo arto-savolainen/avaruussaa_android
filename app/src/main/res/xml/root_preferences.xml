@@ -4,7 +4,7 @@
     <EditTextPreference
         app:key="threshold"
         app:title="@string/settings_threshold_title"
-        app:defaultValue="0.4"
+        app:defaultValue="60"
         app:useSimpleSummaryProvider="true" />
     <EditTextPreference
         app:key="interval"

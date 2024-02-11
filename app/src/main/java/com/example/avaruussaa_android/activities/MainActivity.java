@@ -80,15 +80,15 @@ public class MainActivity extends AppCompatActivity {
                     // Color text according to the strength of magnetic activity.
                     try {
                         double activityDouble = Double.parseDouble(newActivity);
-                        if (activityDouble < 0.3) {
+                        if (activityDouble < 60) {
                             probabilityView.setText(R.string.main_probability_text_quiet);
                             probabilityView.setTextAppearance(R.style.probability_quiet);
                             activityView.setTextColor(getColor(R.color.activity_blue));
-                        } else if (activityDouble >= 0.3 && activityDouble < 0.4) {
+                        } else if (activityDouble >= 60 && activityDouble < 120) {
                             probabilityView.setText(R.string.main_probability_text_low);
                             probabilityView.setTextAppearance(R.style.probability_low);
                             activityView.setTextColor(getColor(R.color.aurora_yellow));
-                        } else if (activityDouble >= 0.4) {
+                        } else {
                             probabilityView.setText(R.string.main_probability_text_high);
                             probabilityView.setTextAppearance(R.style.probability_high);
                             activityView.setTextColor(getColor(R.color.aurora_red));

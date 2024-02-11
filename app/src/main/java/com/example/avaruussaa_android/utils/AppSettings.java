@@ -19,7 +19,7 @@ public class AppSettings {
     }
 
     public double getNotificationThreshold() {
-        return getDoubleFromStringPref("threshold", "0.4");
+        return getDoubleFromStringPref("threshold", "60");
     }
 
     public double getNotificationInterval() {

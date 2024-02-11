@@ -6,7 +6,7 @@
 
     <!-- Main activity -->
     <string name="main_activity_title">AKTIIVISUUS</string>
-    <string name="main_activity_unit">(nT/s)</string>
+    <string name="main_activity_unit">(R)</string>
     <string name="main_loading_text">ladataan...</string>
     <string name="main_btn_settings_content_description">Asetusnäkymään</string>
     <string name="main_iv_background_image_content_description">Taustakuva: revontulet kaupungin valojen yllä</string>
@@ -17,7 +17,7 @@
 
     <!-- Settings activity -->
     <string name="title_activity_settings">Asetukset</string>
-    <string name="settings_threshold_title">Ilmoituskynnys (nT/s)</string>
+    <string name="settings_threshold_title">Ilmoituskynnys (R)</string>
     <string name="settings_interval_title">Ilmoitusväli (tuntia)</string>
     <string name="settings_notifications_title">Ilmoitukset</string>
     <string name="settings_notifications_summary_off">Ilmoitukset pois päältä</string>
@@ -41,5 +41,5 @@
     <string name="notification_channel_name">Revontuli-ilmoitukset</string>
     <string name="notification_channel_description">Lähettää ilmoituksen kun revontulien todennäköisyys aseman alueella on suuri.</string>
     <string name="notification_title">Revontulet todennäköisiä</string>
-    <string name="notification_body">"Magneettinen aktiivisuus @ %1$s: %2$s nT/s"</string>
+    <string name="notification_body">"Magneettinen aktiivisuus @ %1$s: %2$s R"</string>
 </resources>
